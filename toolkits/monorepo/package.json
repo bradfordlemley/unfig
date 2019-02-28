@@ -1,0 +1,21 @@
+{
+  "name": "@unfig/toolkit-monorepo",
+  "license": "MIT",
+  "author": "Bradford Lemley <bradfordlemley@gmail.com>",
+  "version": "0.0.2-alpha.0",
+  "main": "lib/index.js",
+  "dependencies": {
+    "@unfig/toolkit-flow": "^0.0.2-alpha.0",
+    "@unfig/toolkit-husky": "^0.0.2-alpha.0",
+    "@unfig/toolkit-jest": "^0.0.2-alpha.0",
+    "execa": "1.0.0"
+  },
+  "devDependencies": {
+    "@unfig/toolkit-bare-node": "^0.0.2-alpha.0",
+    "@unfig/type-toolkit": "^0.0.2-alpha.0",
+    "unfig": "^0.0.2-alpha.0"
+  },
+  "engines": {
+    "node": ">=8.3"
+  }
+}

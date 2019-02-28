@@ -1,0 +1,14 @@
+{
+  "tests": {
+    "src/counter.test.ts": {
+      "results": {
+        "passed": 2
+      }
+    },
+    "src/component.test.tsx": {
+      "results": {
+        "passed": 1
+      }
+    }
+  }
+}

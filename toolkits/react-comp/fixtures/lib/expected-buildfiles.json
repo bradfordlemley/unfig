@@ -1,0 +1,15 @@
+{
+  "dist": [
+    "mylib.development.js",
+    "mylib.development.js.map",
+    "mylib.esm.js",
+    "mylib.esm.js.map",
+    "mylib.js",
+    "mylib.production.js",
+    "mylib.production.js.map",
+    "mylib.umd.development.js",
+    "mylib.umd.development.js.map",
+    "mylib.umd.production.js",
+    "mylib.umd.production.js.map"
+  ]
+}

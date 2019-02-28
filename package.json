@@ -1,0 +1,25 @@
+{
+  "private": true,
+  "workspaces": {
+    "packages": [
+      "packages/*",
+      "toolkits/*",
+      "examples/*",
+      "__testpkgs__/**"
+    ]
+  },
+  "scripts": {
+    "reset": "lerna clean -y && yarn"
+  },
+  "dependencies": {
+    "husky": "^1.2.0",
+    "lerna": "^3.13.1",
+    "lint-staged": "^8.1.0",
+    "prettier-package-json": "^2.0.1"
+  },
+  "devDependencies": {
+    "flow-bin": "^0.91.0",
+    "flow-mono-cli": "^1.4.3"
+  },
+  "author": "Bradford Lemley <bradfordlemley@gmail.com>"
+}

@@ -1,0 +1,9 @@
+{
+  "tests": {
+    "src/index.test.js": {
+      "results": {
+        "passed": 1
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+.DS_Store
+.AppleDouble
+.LSOverride
+*.log
+**/node_modules/**
+**/dist/**
+coverage/
+**/__temp__/**
+**/package-lock.json
+__testpkgs__
+test-workspaces

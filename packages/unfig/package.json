@@ -1,0 +1,40 @@
+{
+  "name": "unfig",
+  "license": "MIT",
+  "author": "Bradford Lemley <bradfordlemley@gmail.com>",
+  "version": "0.0.2-alpha.0",
+  "main": "lib/index.js",
+  "bin": {
+    "unfig": "./lib/cli.js"
+  },
+  "scripts": {
+    "publish": "npx lerna exec --no-bail -- npm publish --access public",
+    "unfig": "node ./lib/cli.js",
+    "version": "npx lerna version --no-push"
+  },
+  "dependencies": {
+    "@unfig/find-monorepo": "^0.0.2-alpha.0",
+    "@unfig/find-pkg": "^0.0.2-alpha.0",
+    "@unfig/find-up": "^0.0.2-alpha.0",
+    "chalk": "^2.4.1",
+    "execa": "1.0.0",
+    "find-pkg": "^2.0.0",
+    "fs-extra": "^7.0.1",
+    "inquirer": "^6.2.1",
+    "inquirer-prompt-suggest": "^0.1.0",
+    "lint-staged": "^8.1.0",
+    "maxstache": "^1.0.7",
+    "npm-which": "3.0.1",
+    "validate-npm-package-name": "^3.0.0",
+    "yargs": "13.2.1",
+    "yargs-parser": "^13.0.0"
+  },
+  "devDependencies": {
+    "@unfig/testutils": "^0.0.2-alpha.0",
+    "@unfig/toolkit-bare-node": "^0.0.2-alpha.0",
+    "@unfig/type-toolkit": "^0.0.2-alpha.0"
+  },
+  "engines": {
+    "node": ">=8.3"
+  }
+}

@@ -1,0 +1,5 @@
+{
+  "name": "@unfigreactcomp/test_lib",
+  "main": "dist/mylib.js",
+  "module": "dist/mylib.esm.js"
+}

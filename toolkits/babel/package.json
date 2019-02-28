@@ -1,0 +1,15 @@
+{
+  "name": "@unfig/toolkit-babel",
+  "license": "MIT",
+  "author": "Bradford Lemley <bradfordlemley@gmail.com>",
+  "version": "0.0.2-alpha.0",
+  "main": "lib/index.js",
+  "peerDependencies": {
+    "babel": "*"
+  },
+  "devDependencies": {
+    "@unfig/toolkit-bare-node": "^0.0.2-alpha.0",
+    "@unfig/type-toolkit": "^0.0.2-alpha.0",
+    "unfig": "^0.0.2-alpha.0"
+  }
+}

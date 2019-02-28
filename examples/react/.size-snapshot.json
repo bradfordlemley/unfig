@@ -1,0 +1,66 @@
+{
+  "dist/@unfig/react-example.cjs.development.js": {
+    "bundled": 1684,
+    "minified": 1038,
+    "gzipped": 519
+  },
+  "dist-es/index.js": {
+    "bundled": 1442,
+    "minified": 846,
+    "gzipped": 439,
+    "treeshaked": {
+      "rollup": {
+        "code": 572,
+        "import_statements": 47
+      },
+      "webpack": {
+        "code": 1608
+      }
+    }
+  },
+  "dist/index.js.cjs.development.js": {
+    "bundled": 1684,
+    "minified": 1038,
+    "gzipped": 519
+  },
+  "dist/index.development..js": {
+    "bundled": 1684,
+    "minified": 1038,
+    "gzipped": 519
+  },
+  "dist/index.development.js": {
+    "bundled": 1684,
+    "minified": 1038,
+    "gzipped": 519
+  },
+  "dist/index.production.js": {
+    "bundled": 1684,
+    "minified": 1038,
+    "gzipped": 519
+  },
+  "dist/index.js": {
+    "bundled": 1684,
+    "minified": 1038,
+    "gzipped": 519
+  },
+  "dist/index.umd.js": {
+    "bundled": 1684,
+    "minified": 1038,
+    "gzipped": 519
+  },
+  "dist/index.umd.prooduction.js": {
+    "bundled": 2155,
+    "minified": 1052,
+    "gzipped": 572
+  },
+  "dist/index.umd.production.js": {
+    "bundled": 4616,
+    "minified": 1742,
+    "gzipped": 943
+  },
+  "dist/index.umd.development.js": {
+    "bundled": 42343,
+    "minified": 12575,
+    "gzipped": 4320
+  }
+}

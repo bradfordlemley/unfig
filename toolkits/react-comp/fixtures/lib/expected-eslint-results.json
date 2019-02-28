@@ -1,0 +1,22 @@
+{
+  "src/component.test.tsx": {
+    "errorCount": 0,
+    "warningCount": 0
+  },
+  "src/component.tsx": {
+    "errorCount": 0,
+    "warningCount": 0
+  },
+  "src/counter.test.ts": {
+    "errorCount": 0,
+    "warningCount": 0
+  },
+  "src/counter.ts": {
+    "errorCount": 0,
+    "warningCount": 0
+  },
+  "src/index.js": {
+    "errorCount": 0,
+    "warningCount": 0
+  }
+}

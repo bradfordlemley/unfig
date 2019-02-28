@@ -1,0 +1,17 @@
+//@flow strict
+export type DependencyEntries = {[string]: string};
+
+export type PkgJson = {
+  name: string,
+  main?: string,
+  module?: string,
+  dependencies?: DependencyEntries,
+  devDependencies?: DependencyEntries,
+  peerDependencies?: DependencyEntries,
+  private?: boolean,
+  scripts?: {[string]: string},
+  workspaces?: Array<string>|{
+    packages: Array<string>,
+    nohoist?: Array<string>,
+  }
+};

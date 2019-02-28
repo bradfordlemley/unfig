@@ -1,0 +1,109 @@
+//@flow strict
+
+import {type PkgJson} from '@unfig/type-pkg-json';
+
+type RunResult = {
+  stdout: ?string,
+  stderr: ?string,
+  code: number,
+};
+
+type RunOpts = {|
+  nodeArgs?: $ReadOnlyArray<string>,
+  stdio?: string,
+|};
+
+export type Run = (string, ?$ReadOnlyArray<string>, ?RunOpts) => Promise<RunResult>;
+
+export type PkgData = {|
+  pkgDir: string,
+  pkgFile: string,
+  pkgJson: PkgJson,
+|};
+
+export type EnvType = {|
+  +origCwd: string,
+  +rootDir: string,
+  +monoRepo?: {
+    +pkg: PkgData,
+    +pkgs: $ReadOnlyArray<PkgData>,
+  },
+  +pkg: ?$ReadOnly<PkgData>,
+  +cfg?: {
+    cfgFile: string,
+    cfgDir: string,
+  },
+  +cfgFilename: string,
+  +gArgs: $ReadOnlyArray<string>,
+  +run: Run,
+|};
+
+export type CommandResult = {} | string;
+
+export type CommandHandlerArgs<CommandFlags> = {|
+  +args: $ReadOnlyArray<string>,
+  +argv: CommandFlags,
+  +env: EnvType,
+  +self: LoadedPlugin,
+|};
+
+export type Command = {|
+  +handler: $ReadOnly<CommandHandlerArgs<{}>> => Promise<CommandResult>,
+  +describe?: string,
+|};
+
+export type GetModuleHandlerArgs = {|
+  +env: EnvType,
+  +requestFile: string,
+  +self: LoadedPlugin,
+|};
+
+// $ExpectError: any
+type GenericGetModuleResult = any;
+
+export type GetModuleHandler<T=GenericGetModuleResult> = ($ReadOnly<GetModuleHandlerArgs>) => T;
+
+export type PluginBase = {|
+  toolkits?: Array<(?Plugin | CreatePlugin<> | false)>,
+  modules?: {
+    [string]: ?GetModuleHandler<> | false,
+  },
+  commands?: {
+    [string]: ?Command | false,
+  },
+|};
+
+export type Plugin = {|
+  ...PluginBase,
+  load?: $ReadOnly<EnvType> => PluginBase,
+  filepath: string,
+|};
+
+export type CreatePlugin<T={}> = (cfg :T) => Plugin;
+
+export type LoadedCmd = {
+  ...Command,
+  exec: (args: ?$ReadOnlyArray<string>) => Promise<CommandResult>,
+};
+
+export type LoadedGetModule = {
+  handler: GetModuleHandler<>,
+  get: (requestFile: string) => GenericGetModuleResult,
+};
+
+export type LoadedPlugin = {|
+  modules: {
+    [string]: LoadedGetModule,
+  },
+  commands: {
+    [string]: LoadedCmd,
+  },
+  execCmd: (cmd: string, args: ?$ReadOnlyArray<string>) => Promise<CommandResult>,
+  getModule: (requestFile: string) => GenericGetModuleResult,
+  toolkits: Array<LoadedPlugin>,
+  children: {
+    execCmd: (cmd: string, args: ?$ReadOnlyArray<string>) => Promise<CommandResult>,
+    getModule: (requestFile: string) => GenericGetModuleResult,   
+  },
+  filepath: string,
+|};

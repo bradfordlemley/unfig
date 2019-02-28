@@ -1,0 +1,25 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "CLI",
+      "program": "${workspaceFolder}/tests/cli-debug.js",
+      "args": [],
+      "cwd": "${workspaceRoot}",
+      "console": "integratedTerminal",
+      "protocol": "inspector",
+      "internalConsoleOptions": "neverOpen",
+      /*
+      disableOptimisticBPs:
+        https://github.com/facebook/create-react-app/issues/5319
+        2018-12-06: only in vscode insiders, but should be mainstream soon
+      */
+      "disableOptimisticBPs": true
+    }
+  ]
+}

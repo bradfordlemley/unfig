@@ -1,0 +1,23 @@
+// @flow strict
+/*::
+
+import type {CommandResult, EnvType} from '@unfig/type-toolkit';
+
+export type InternalCmdArgs<CommandFlags> = {|
+  args: $ReadOnlyArray<string>,
+  argv: CommandFlags,
+  env: EnvType,
+|};
+
+export type InternalCmd<CommandFlags> = $ReadOnly<InternalCmdArgs<CommandFlags>> => Promise<CommandResult>;
+
+export type InternalCmdEntry = {|
+  command?: string,
+  describe: string,
+  // $ExpectError: any
+  builder: any,
+  // $ExpectError: any
+  handler: InternalCmd<any>,
+|};
+
+*/

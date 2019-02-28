@@ -1,0 +1,19 @@
+{
+  "name": "@unfig/toolkit-flow",
+  "license": "MIT",
+  "author": "Bradford Lemley <bradfordlemley@gmail.com>",
+  "version": "0.0.2-alpha.0",
+  "main": "lib/index.js",
+  "peerDependencies": {
+    "flow-bin": "*",
+    "flow-typed": "*"
+  },
+  "devDependencies": {
+    "@unfig/toolkit-bare-node": "^0.0.2-alpha.0",
+    "@unfig/type-toolkit": "^0.0.2-alpha.0",
+    "unfig": "^0.0.2-alpha.0"
+  },
+  "engines": {
+    "node": ">=8.3"
+  }
+}

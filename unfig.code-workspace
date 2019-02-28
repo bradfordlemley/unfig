@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "packages/unfig"
+		}
+	],
+	"settings": {
+		"flow.useNPMPackagedFlow": true
+	}
+}
