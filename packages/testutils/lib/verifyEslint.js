@@ -1,13 +1,14 @@
 //@flow strict
 const fs = require('fs-extra');
 const path = require('path');
+const normalize = require('./normalize');
 
 function parseResults(file /* :string */, relDir /* :string */) {
   const results = fs.readJSONSync(file);
   const summary = {};
   results.forEach(result => {
     const { filePath, errorCount, warningCount } = result;
-    const name = relDir ? path.relative(relDir, filePath) : filePath;
+    const name = normalize(relDir ? path.relative(relDir, filePath) : filePath);
     summary[name] = { errorCount, warningCount };
   });
   return summary;

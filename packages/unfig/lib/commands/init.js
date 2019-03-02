@@ -48,6 +48,7 @@ async function createConfigFile(
     ...(opts.unfigModule ? { unfigModule: opts.unfigModule } : {}),
     ...templateVarOverrides,
   };
+  templateVars.unfigModule = templateVars.unfigModule.replace(/\\/g, '\\\\');
   const content = genFromFile(templateFile, templateVars);
   let create = true;
   if (fs.existsSync(targetFile)) {
@@ -102,7 +103,7 @@ const init = (async function init({ env, argv }) {
     throw new Error(`package.json missing in ${targetDir}`);
   }
   const targetFile = path.join(targetDir, env.cfgFilename);
-  console.log(chalk.green(`Creating at ${targetDir}.`));
+  console.log(chalk.green(`Initializing at ${targetDir}.`));
   let toolkit = undefined;
   if (!fs.existsSync(targetFile)) {
     if (argv.toolkit) {
@@ -125,7 +126,9 @@ const init = (async function init({ env, argv }) {
     if (!isPath(toolkit)) {
       await env.run('yarn', ['add', toolkit, '--dev']);
     }
-    writeConfig(targetFile, { toolkit: removeVersion(toolkit) });
+    writeConfig(targetFile, {
+      toolkit: removeVersion(toolkit).replace(/\\/g, '\\\\'),
+    });
   }
 
   const { unfig } = getUnfig(targetDir);

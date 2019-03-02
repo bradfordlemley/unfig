@@ -1,5 +1,7 @@
 // @flow strict
 
+const process = require('process');
+
 // $ExpectError: untyped import
 const commonjs = require('rollup-plugin-commonjs');
 // $ExpectError: untyped import
@@ -190,7 +192,7 @@ module.exports = (cfg /*: RollupCfgInput */) => {
           exclude: '**/node_modules/**',
           extensions: cfg.extensions,
         }),
-        sizeSnapshot(),
+        process.platform !== 'win32' && sizeSnapshot(),
         sourceMaps(),
       ],
     },

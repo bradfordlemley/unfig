@@ -1,6 +1,7 @@
 //@flow strict
 const fs = require('fs-extra');
 const path = require('path');
+const normalize = require('./normalize');
 
 function parseResults(file /* :string */, relDir /* :string */) {
   const results /* :{[string]: {+s: string}} */ = fs.readJSONSync(file);
@@ -8,7 +9,7 @@ function parseResults(file /* :string */, relDir /* :string */) {
   // Object.entries(results).forEach(([filePath, result]) => {
   Object.keys(results).forEach(filepath => {
     const { s } = results[filepath];
-    const name = relDir ? path.relative(relDir, filepath) : filepath;
+    const name = normalize(relDir ? path.relative(relDir, filepath) : filepath);
     summary[name] = { s };
   });
   return summary;

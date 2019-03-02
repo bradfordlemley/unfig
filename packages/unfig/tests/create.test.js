@@ -9,6 +9,7 @@ const testPkgs = path.resolve(__dirname, '../../../__testpkgs__');
 let workspaceDir = null;
 
 beforeEach(() => {
+  fs.mkdirsSync(testPkgs);
   workspaceDir = fs.mkdtempSync(`${testPkgs}/create-`);
 });
 afterEach(() => {
@@ -21,8 +22,8 @@ test('Create', async () => {
     workspaceDir,
     '--toolkit',
     path.join(__dirname, './simple-toolkit/simple-toolkit.js'),
-    // '--frameworkPkg',
-    // 'unfig',
+    '--frameworkPkg',
+    path.join(__dirname, '..'),
   ]);
 
   verifyDir(workspaceDir, [

@@ -25,6 +25,7 @@ async function createPkg(
   frameworkPkg /*: ?string */,
   initArgs /*: $ReadOnlyArray<string> */
 ) {
+  console.log(chalk.green(`Initializing at ${dir}.`));
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
   }
