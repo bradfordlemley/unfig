@@ -166,6 +166,14 @@ There is no guarantee that your modifications will work for other versions of th
 
 Basically, you are [monkey-patching](https://en.wikipedia.org/wiki/Monkey_patch) the `configuration`. Have a good name for this?
 
+### How can actual `configurations` be viewed?
+
+`node -p "require('./.babelrc.js')"`
+
+or
+
+`node -p "JSON.stringify(require('./.babelrc.js'), null, 2)"`
+
 # Existing Toolkits
 
 ### Analysis of Existing Toolkits
