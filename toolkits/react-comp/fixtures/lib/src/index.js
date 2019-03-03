@@ -1,3 +1,3 @@
-export { default as Counter } from './counter.ts';
+export { default as Counter } from './counter';
 
-export { default as Component } from './component.tsx';
+export { default as Component } from './component';

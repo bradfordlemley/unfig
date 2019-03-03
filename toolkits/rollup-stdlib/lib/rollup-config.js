@@ -62,7 +62,7 @@ const buildUmd = ({
       globals,
     },
     plugins: [
-      resolve(),
+      resolve({ extensions }),
       replace({
         'process.env.NODE_ENV': JSON.stringify(env),
       }),
@@ -112,7 +112,7 @@ const buildCjs = ({ env, input, file, extensions }) => {
       sourcemap: true,
     },
     plugins: [
-      resolve(),
+      resolve({ extensions }),
       replace({
         'process.env.NODE_ENV': JSON.stringify(env),
       }),
@@ -141,10 +141,12 @@ const buildCjs = ({ env, input, file, extensions }) => {
 };
 
 module.exports = (cfg /*: RollupCfgInput */) => {
-  const { pkgJson, input, umdGlobals, extensions, files } = cfg || {};
+  const { pkgJson, input, umdGlobals, extensions: exts, files } = cfg || {};
   if (!pkgJson) {
     throw new Error(`PkgJson is required for rollup config`);
   }
+  const extensions =
+    exts && exts.map(ext => (ext.startsWith('.') ? ext : `.${ext}`));
   return [
     buildUmd({
       env: 'production',
@@ -187,7 +189,7 @@ module.exports = (cfg /*: RollupCfgInput */) => {
         },
       ],
       plugins: [
-        resolve(),
+        resolve({ extensions }),
         babel({
           exclude: '**/node_modules/**',
           extensions: cfg.extensions,
