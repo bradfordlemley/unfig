@@ -71,6 +71,9 @@ export type PluginBase = {|
   commands?: {
     [string]: ?Command | false,
   },
+  dependencies?: {
+    [string]: string,
+  }
 |};
 
 export type Plugin = {|
@@ -97,6 +100,9 @@ export type LoadedPlugin = {|
   },
   commands: {
     [string]: LoadedCmd,
+  },
+  dependencies: {
+    [string]: string,
   },
   execCmd: (cmd: string, args: ?$ReadOnlyArray<string>) => Promise<CommandResult>,
   getModule: (requestFile: string) => GenericGetModuleResult,

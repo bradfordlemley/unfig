@@ -17,16 +17,19 @@ export type RollupCfgPluginCfg = {|
 
 */
 
-function getFiles(pkgJson /*: $ReadOnly<PkgJson> */) {
+function getFiles(pkgJson /*: $ReadOnly<PkgJson> */, pkgFile /*: string */) {
   if (!pkgJson.main) {
-    throw new Error(`main missing in package.json`);
+    throw new Error(`main missing in package.json: ${pkgFile}`);
+  }
+  if (!pkgJson.module) {
+    throw new Error(`module missing in package.json: ${pkgFile}`);
   }
   const { dir, name, ext } = path.parse(pkgJson.main);
 
   if (!dir) {
     throw new Error(
       `package.json main entry should include a directory, got: "${pkgJson.main ||
-        ''}"`
+        ''}": : ${pkgFile}`
     );
   }
   if (pkgJson.module) {
@@ -67,7 +70,7 @@ module.exports = (cfg => {
             throw new Error(`No pkgJson`);
           }
           return require('./rollup-config')(
-            Object.assign({}, cfg, { files: getFiles(env.pkg.pkgJson) })
+            Object.assign({}, cfg, { files: getFiles(env.pkg.pkgJson, env.pkg.pkgFile) })
           );
         },
       }),
@@ -75,11 +78,11 @@ module.exports = (cfg => {
     commands: {
       rollup: {
         describe: 'Package project',
-        handler: async ({ env, self }) => {
+        handler: async ({ env, self, args }) => {
           if (!env.pkg || !env.pkg.pkgJson) {
             throw new Error(`No pkgJson`);
           }
-          const files = getFiles(env.pkg.pkgJson);
+          const files = getFiles(env.pkg.pkgJson, env.pkg.pkgFile);
           if (!env.pkg) {
             throw new Error(`Package does not have main entry`);
           }
@@ -93,7 +96,7 @@ module.exports = (cfg => {
               developmentModule: files.cjs_dev,
             }
           );
-          return self.children.execCmd('rollup', ['-c']);
+          return self.children.execCmd('rollup', ['-c'].concat(args));
         },
       },
     },

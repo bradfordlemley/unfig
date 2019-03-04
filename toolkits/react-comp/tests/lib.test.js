@@ -9,14 +9,14 @@ const {
 } = require('@unfig/testutils');
 
 const fixturesDir = path.resolve(__dirname, '../fixtures');
-const createWorkspace = withWorkspaces(
+const { initWorkspace } = withWorkspaces(
   path.resolve(__dirname, '../__test-wkspcs__/lib')
 );
 
 const toolkit = path.resolve(__dirname, '../lib');
 
 test('Shows help', async () => {
-  const { exec } = await createWorkspace(
+  const { exec } = await initWorkspace(
     path.join(fixturesDir, 'lib'),
     toolkit
   );
@@ -33,7 +33,7 @@ test('Shows help', async () => {
 });
 
 test('Builds, tests, and lints', async () => {
-  const { cmd, dir, exec } = await createWorkspace(
+  const { cmd, dir, exec } = await initWorkspace(
     path.join(fixturesDir, 'lib'),
     toolkit
   );
@@ -74,7 +74,7 @@ test('Builds, tests, and lints', async () => {
 });
 
 test('Detects lint', async () => {
-  const { exec, dir } = await createWorkspace(
+  const { exec, dir } = await initWorkspace(
     path.join(fixturesDir, 'libWithLint'),
     toolkit
   );
@@ -99,7 +99,7 @@ test('Detects lint', async () => {
 });
 
 test('Detects bad source', async () => {
-  const { exec } = await createWorkspace(
+  const { exec } = await initWorkspace(
     path.join(fixturesDir, 'badSrc'),
     toolkit
   );
@@ -125,7 +125,7 @@ test('Detects bad source', async () => {
 });
 
 test('Detects failed test', async () => {
-  const { exec, dir } = await createWorkspace(
+  const { exec, dir } = await initWorkspace(
     path.join(fixturesDir, 'libFailTest'),
     toolkit
   );

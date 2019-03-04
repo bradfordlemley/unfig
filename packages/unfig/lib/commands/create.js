@@ -25,7 +25,6 @@ async function createPkg(
   frameworkPkg /*: ?string */,
   initArgs /*: $ReadOnlyArray<string> */
 ) {
-  console.log(chalk.green(`Initializing at ${dir}.`));
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir);
   }
@@ -37,10 +36,7 @@ async function createPkg(
     cwd: dir,
     stdio: 'inherit',
   });
-  execa.sync('yarn', ['unfig', 'init'].concat(initArgs), {
-    cwd: dir,
-    stdio: 'inherit',
-  });
+  await require('../').execCmd(['--rootDir', dir, 'init'].concat(initArgs));
 }
 
 const create = (async function create({ argv, args }) {

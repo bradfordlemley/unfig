@@ -10,6 +10,7 @@ import {type PkgJson} from '@unfig/type-pkg-json';
 import type { Plugin, LoadedPlugin, GetModuleHandler, Command, EnvType } from '@unfig/type-toolkit';
 
 type NormalizedPluginType = {|
+  dependencies: { [string] : string},
   toolkits: Array<Plugin>,
   modules: {
     [string]: GetModuleHandler<>,
@@ -50,6 +51,7 @@ function makePlugin(
     return out;
   }
   const toolkit = {
+    dependencies: base.dependencies,
     filepath: base.filepath,
     modules: seedModules(base.modules),
     commands: seedCommands(base.commands),
@@ -124,6 +126,7 @@ function makePlugin(
   toolkits.forEach(p => {
     p.commands && mergeObj(toolkit.commands, p.commands);
     p.modules && mergeObj(toolkit.modules, p.modules);
+    p.dependencies && mergeObj(toolkit.dependencies, p.dependencies);
   });
 
   return toolkit;
@@ -178,6 +181,7 @@ function preloadPlugin(
 ) /* :NormalizedPluginType */ {
   const toolkits = toolkit.toolkits ? stripArr(toolkit.toolkits) : [];
   const preloaded = {
+    dependencies: toolkit.dependencies || {},
     filepath: toolkit.filepath,
     modules: stripObj(toolkit.modules),
     commands: stripObj(toolkit.commands),
@@ -186,10 +190,11 @@ function preloadPlugin(
 
   if (toolkit.load) {
     const loadedParts = toolkit.load(env);
-    const { modules, commands } = loadedParts;
+    const { modules, commands, dependencies } = loadedParts;
 
     mergeObj(preloaded.modules, modules);
     mergeObj(preloaded.commands, commands);
+    mergeObj(preloaded.dependencies, dependencies);
 
     if (loadedParts.toolkits) {
       preloaded.toolkits = preloaded.toolkits.concat(

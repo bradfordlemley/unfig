@@ -35,6 +35,9 @@ module.exports = (cfg => {
         }
       }
     },
+    dependencies: {
+      eslint: "",
+    },
     modules: {
       ".eslintrc.js": eslintCfg
     },

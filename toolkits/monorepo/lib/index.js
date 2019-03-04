@@ -116,6 +116,13 @@ module.exports = (cfg => ({
             return runCommand('validate');
           },
         },
+        reset: {
+          describe: 'Run command on all packages in monorepo',
+          handler: async ({ env }) => {
+            await env.run('lerna', ['clean', '-y']);
+            return env.run('yarn');
+          },
+        },
         run: {
           describe: 'Run command on all packages in monorepo',
           handler: ({ args }) => runCommand(args[0]),

@@ -5,7 +5,8 @@
       "packages/*",
       "toolkits/*",
       "examples/*",
-      "__testpkgs__/**"
+      "__test-wkspcs__/**",
+      "__test-wkspcs__/*/**"
     ]
   },
   "scripts": {

@@ -12,7 +12,6 @@ const simplePlugin = path.resolve(
 let workspaceDir = null;
 
 beforeEach(() => {
-  fs.mkdirsSync(testPkgs);
   workspaceDir = fs.mkdtempSync(`${testPkgs}/init-`);
 });
 afterEach(() => {
