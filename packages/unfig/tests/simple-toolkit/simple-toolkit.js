@@ -1,4 +1,7 @@
 module.exports = () => ({
+  dependencies: {
+    eslint: "5.10.0"
+  },
   modules: {
     '.config1.js': () => 'config1',
     'config2.js': () => 'config2',

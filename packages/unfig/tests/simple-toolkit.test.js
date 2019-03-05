@@ -17,6 +17,13 @@ beforeAll(async () => {
   ({execCmd, dir} = ws);
 }, 30000);
 
+
+test('uses unfig from monorepo', async () => {
+  if (fs.existsSync(path.join(dir, 'node_modules', 'unfig'))) {
+    throw new Error(`Unfig exists in ${dir}/node_modules`)
+  }
+});
+
 test('creates files', async () => {
   verifyDir(dir, [
     '.config1.js',

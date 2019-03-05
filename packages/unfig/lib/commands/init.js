@@ -137,6 +137,17 @@ const init = (async function init({ env, argv }) {
       }
     });
   }
+
+  if (unfig && unfig.dependencies) {
+    const deps = [];
+    Object.keys(unfig.dependencies).forEach(dep => {
+      deps.push(`${dep}@${unfig.dependencies[dep]}`)
+    });
+    if (deps.length) {
+      await env.run('yarn', ['add', '--dev'].concat(deps));
+    }
+  }
+
   return { code: 0 };
 } /*: InternalCmd<InitFlags> */);
 
