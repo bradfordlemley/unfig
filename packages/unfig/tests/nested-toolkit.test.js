@@ -1,3 +1,4 @@
+const execa = require('execa');
 const fs = require('fs-extra');
 const path = require('path');
 const unfig = require('../lib');
@@ -15,8 +16,15 @@ beforeAll(async () => {
   ws = await createWorkspace(
     path.resolve(__dirname, "nested-toolkit/toolkit")
   );
+  await execa('yarn', {cwd: ws.dir});
   ({execCmd, dir} = ws);
 }, 30000);
+
+test('uses unfig from monorepo', async () => {
+  if (fs.existsSync(path.join(dir, 'node_modules', 'unfig'))) {
+    throw new Error(`Unfig exists in ${dir}/node_modules`)
+  }
+});
 
 test('Top config overrides child', () => {
   expect(unfig.getCfg(path.join(dir, 'config1.js'))).toEqual(

@@ -5,6 +5,10 @@ import type {CreatePlugin} from '@unfig/type-toolkit';
 */
 
 module.exports = (() => ({
+  dependencies: {
+    eslint: "5.10.0",
+    babel: "6.0.0",
+  },
   toolkits: [require('./nested-toolkit.js')],
   modules: {
     'config1.js': () => 'top-config1',
