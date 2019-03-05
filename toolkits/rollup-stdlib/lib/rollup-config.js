@@ -1,7 +1,6 @@
 // @flow strict
-
+// $ExpectError: untyped import
 const process = require('process');
-
 // $ExpectError: untyped import
 const commonjs = require('rollup-plugin-commonjs');
 // $ExpectError: untyped import

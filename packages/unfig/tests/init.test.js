@@ -16,7 +16,7 @@ beforeEach(() => {
   workspaceDir = fs.mkdtempSync(`${testPkgs}/init/`);
 });
 afterEach(() => {
-  // workspaceDir && fs.removeSync(workspaceDir);
+  workspaceDir && fs.removeSync(workspaceDir);
 });
 
 function readuntil(stream, predicate, timeoutMs = 5000) {

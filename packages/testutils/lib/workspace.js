@@ -22,6 +22,7 @@ function makeWorkspaceUtils(dir /* :string */) {
     spawnSync: (args /* :Array<string> */) =>
       execa.sync('unfig', args, { cwd: dir, reject: false }),
     execCmd: (args /* :Array<string> */) =>
+      // $ExpectError: not flow strict
       require('unfig').execCmd(['--rootDir', dir].concat(args)),
   };
 }
@@ -61,6 +62,7 @@ async function createWorkspace(
   if (toolkit) {
     args = args.concat(['--toolkit', toolkit]);
   }
+  // $ExpectError: not flow strict
   await require("unfig").execCmd(args);
   fixtureDir && fs.copySync(fixtureDir, workspaceDir);
   return workspace;
@@ -68,7 +70,7 @@ async function createWorkspace(
 
 function withWorkspaces(workspaceRoot /* :string */) {
   afterAll(async () => {
-    // workspaceRoot && (await fs.emptyDir(workspaceRoot));
+    workspaceRoot && (await fs.emptyDir(workspaceRoot));
   });
 
   return {
