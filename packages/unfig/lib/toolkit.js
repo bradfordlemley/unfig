@@ -50,8 +50,18 @@ function makePlugin(
     });
     return out;
   }
+  function seedDependencies(dependencies) {
+    const out = {};
+    Object.keys(dependencies).forEach(key => {
+      out[key] = {
+        version: dependencies[key],
+        toolkit: base.filepath,
+      };
+    });
+    return out;
+  }
   const toolkit = {
-    dependencies: base.dependencies,
+    dependencies: seedDependencies(base.dependencies),
     filepath: base.filepath,
     modules: seedModules(base.modules),
     commands: seedCommands(base.commands),

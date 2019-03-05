@@ -4,13 +4,13 @@ const path = require('path');
 const unfig = require('../lib');
 const { verifyDir, withWorkspaces } = require('@unfig/testutils');
 
-const { createWorkspace } = withWorkspaces(
+const { initWorkspace } = withWorkspaces(
   path.resolve(__dirname, '../../../__test-wkspcs__/simple-toolkit')
 );
 
 let ws = null, execCmd = null, dir = null;
 beforeAll(async () => {
-  ws = await createWorkspace(
+  ws = await initWorkspace(
     path.resolve(__dirname, "simple-toolkit/simple-toolkit")
   );
   await execa('yarn', {cwd: ws.dir});

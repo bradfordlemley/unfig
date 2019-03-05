@@ -3,7 +3,7 @@ const fs = require('fs-extra');
 const path = require('path');
 const { verifyDir } = require('@unfig/testutils');
 
-const testPkgs = path.resolve(__dirname, '../../../__testpkgs__');
+const testPkgs = path.resolve(__dirname, '../../../__test-wkspcs__');
 const unfigBin = path.resolve(__dirname, '../lib/cli.js');
 const simplePlugin = path.resolve(
   __dirname,
@@ -12,10 +12,11 @@ const simplePlugin = path.resolve(
 let workspaceDir = null;
 
 beforeEach(() => {
-  workspaceDir = fs.mkdtempSync(`${testPkgs}/init-`);
+  fs.ensureDirSync(`${testPkgs}/init/`);
+  workspaceDir = fs.mkdtempSync(`${testPkgs}/init/`);
 });
 afterEach(() => {
-  workspaceDir && fs.removeSync(workspaceDir);
+  // workspaceDir && fs.removeSync(workspaceDir);
 });
 
 function readuntil(stream, predicate, timeoutMs = 5000) {
@@ -40,7 +41,8 @@ function readuntil(stream, predicate, timeoutMs = 5000) {
 
 test('init asks for toolkit input', async () => {
   fs.writeJsonSync(path.join(workspaceDir, 'package.json'), {
-    name: 'test-pkg',
+    name: path.basename(workspaceDir),
+    version: "0.0.1",
   });
   const proc = execa(unfigBin, ['init'], { cwd: workspaceDir });
   proc.stdout.setEncoding('utf-8');
@@ -54,6 +56,7 @@ test('init asks for toolkit input', async () => {
     '.unfig.js',
     'config2.js',
     'config3.js',
+    'node_modules',
     'package.json',
   ]);
 });

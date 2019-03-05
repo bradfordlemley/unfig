@@ -96,7 +96,7 @@ async function createConfigFile(
   }
 }
 
-const init = (async function init({ env, argv }) {
+const init = (async function init({ env, argv, args }) {
   const targetDir = env.rootDir;
   if (!fs.existsSync(path.join(targetDir, 'package.json'))) {
     throw new Error(`package.json missing in ${targetDir}`);
@@ -104,6 +104,7 @@ const init = (async function init({ env, argv }) {
   const targetFile = path.join(targetDir, env.cfgFilename);
   console.log(chalk.green(`Creating at ${targetDir}.`));
   let toolkit = undefined;
+  const noInstall = args.includes('--no-install');
   if (!fs.existsSync(targetFile)) {
     if (argv.toolkit) {
       toolkit = argv.toolkit;
@@ -123,7 +124,7 @@ const init = (async function init({ env, argv }) {
       throw new Error(`Unexpected toolkit type`);
     }
     if (!isPath(toolkit)) {
-      await env.run('yarn', ['add', toolkit, '--dev']);
+      await env.run('yarn', ['add', '--dev', toolkit]);
     }
     writeConfig(targetFile, { toolkit: removeVersion(toolkit) });
   }
@@ -138,10 +139,11 @@ const init = (async function init({ env, argv }) {
     });
   }
 
-  if (unfig && unfig.dependencies) {
+  if (!noInstall && unfig && unfig.dependencies) {
     const deps = [];
     Object.keys(unfig.dependencies).forEach(dep => {
-      deps.push(`${dep}@${unfig.dependencies[dep]}`)
+      const version = unfig.dependencies[dep].version;
+      deps.push(`${dep}${version ? `@${version}` : ""}`)
     });
     if (deps.length) {
       await env.run('yarn', ['add', '--dev'].concat(deps));

@@ -94,6 +94,11 @@ export type LoadedGetModule = {
   get: (requestFile: string) => GenericGetModuleResult,
 };
 
+export type LoadedDependency = {
+  version: string,
+  toolkit: Array<string>,
+}
+
 export type LoadedPlugin = {|
   modules: {
     [string]: LoadedGetModule,
@@ -102,7 +107,7 @@ export type LoadedPlugin = {|
     [string]: LoadedCmd,
   },
   dependencies: {
-    [string]: string,
+    [string]: LoadedDependency,
   },
   execCmd: (cmd: string, args: ?$ReadOnlyArray<string>) => Promise<CommandResult>,
   getModule: (requestFile: string) => GenericGetModuleResult,

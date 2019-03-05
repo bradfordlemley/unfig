@@ -30,15 +30,25 @@ async function initWorkspace(
   workspaceDir /* :string */,
   toolkit /* :?string */,
   fixtureDir /* :?string */,
+  initArgs /* : ?$ReadOnlyArray<string> */,
 ) /*  Promise<{ exec: any, execSync: any, cmd: any, dir: string }> */ {
-  const workspace = makeWorkspaceUtils(workspaceDir);
+  const ws = makeWorkspaceUtils(workspaceDir);
   fixtureDir && fs.copySync(fixtureDir, workspaceDir);
+  const pkgFile = path.join(ws.dir, 'package.json');
+  if (fs.existsSync(pkgFile)) {
+    const pkgJson = fs.readJsonSync(pkgFile);
+    pkgJson.name = path.basename(ws.dir);
+    fs.writeJsonSync(pkgFile, pkgJson);
+  } else {
+    fs.writeJsonSync(pkgFile, {name: path.basename(ws.dir), version: "0.0.1"});
+  }
   let args = ['init', '--no-prompt'];
   if (toolkit) {
     args = args.concat(['--toolkit', toolkit]);
+    args = args.concat(initArgs || []);
   }
-  await workspace.execCmd(args);
-  return workspace;
+  await ws.execCmd(args);
+  return ws;
 }
 
 async function createWorkspace(
@@ -66,9 +76,9 @@ function withWorkspaces(workspaceRoot /* :string */) {
       const dir = createWorkspaceDir(path.join(workspaceRoot, `${path.basename(fixtureDir)}-`));
       return createWorkspace(dir, toolkit, fixtureDir)
     },
-    initWorkspace: (toolkit /* :string */, fixtureDir /* :string */ = '') => {
+    initWorkspace: (toolkit /* :string */, fixtureDir /* :string */ = '', initArgs /* : ?$ReadOnlyArray<string> */) => {
       const dir = createWorkspaceDir(path.join(workspaceRoot, `${path.basename(fixtureDir)}-`));
-      return initWorkspace(dir, toolkit, fixtureDir)
+      return initWorkspace(dir, toolkit, fixtureDir, initArgs)
     },
   };
 }
