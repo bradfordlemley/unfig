@@ -1,18 +1,15 @@
 // @flow
 const path = require('path');
-const { verifyCoverage, verifyEslintResults, verifyFilelist, verifyJestResults, initWorkspace } = require('@unfig/testutils');
+const { verifyCoverage, verifyEslintResults, verifyFilelist, verifyJestResults, initWorkspace, withInitWorkspace } = require('@unfig/testutils');
 
-let ws = {};
-beforeAll(async () => {
-  ws = await initWorkspace(
-    path.resolve(__dirname, '../../../__test-wkspcs__/react-comp/success-'),
-    path.resolve(__dirname, '../lib'),
-    path.resolve(__dirname, '../fixtures/success'),
-    ['--no-install'],
-  );
-}, 30000);
-
-afterAll(() => ws && ws.clean());
+let ws = null;
+withInitWorkspace(
+  w => ws = w,
+  path.resolve(__dirname, '../../../__test-wkspcs__/react-comp/success-'),
+  path.resolve(__dirname, '../lib'),
+  path.resolve(__dirname, '../fixtures/success'),
+  ["--no-install"]
+);
 
 test('Shows help', async () => {
   const { spawn } = ws;

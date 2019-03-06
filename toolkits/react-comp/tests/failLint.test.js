@@ -1,18 +1,15 @@
 
 const path = require('path');
-const { initWorkspace, verifyEslintResults } = require('@unfig/testutils');
+const { withInitWorkspace, verifyEslintResults } = require('@unfig/testutils');
 
-let ws = {};
-beforeAll(async () => {
-  ws = await initWorkspace(
-    path.resolve(__dirname, '../../../__test-wkspcs__/react-comp/failLint-'),
-    path.resolve(__dirname, '../lib'),
-    path.resolve(__dirname, '../fixtures/failLint'),
-    ['--no-install'],
-  );
-}, 30000);
-
-afterAll(() => ws && ws.clean());
+let ws = null;
+withInitWorkspace(
+  w => ws = w,
+  path.resolve(__dirname, '../../../__test-wkspcs__/react-comp/failLint-'),
+  path.resolve(__dirname, '../lib'),
+  path.resolve(__dirname, '../fixtures/failLint'),
+  ["--no-install"]
+);
 
 test('Detects lint', async () => {
   const { dir, spawn } = ws;

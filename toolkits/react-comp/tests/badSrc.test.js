@@ -1,17 +1,14 @@
 const path = require('path');
-const { initWorkspace } = require('@unfig/testutils');
+const { withInitWorkspace } = require('@unfig/testutils');
 
-let ws = {};
-beforeAll(async () => {
-  ws = await initWorkspace(
-    path.resolve(__dirname, '../../../__test-wkspcs__/react-comp/badSrc-'),
-    path.resolve(__dirname, '../lib'),
-    path.resolve(__dirname, '../fixtures/badSrc'),
-    ['--no-install'],
-  );
-}, 30000);
-
-afterAll(() => ws && ws.clean());
+let ws = null;
+withInitWorkspace(
+  w => ws = w,
+  path.resolve(__dirname, '../../../__test-wkspcs__/react-comp/badSrc-'),
+  path.resolve(__dirname, '../lib'),
+  path.resolve(__dirname, '../fixtures/badSrc'),
+  ["--no-install"]
+);
 
 test('Detects bad source', async () => {
   const {spawn} = ws;
