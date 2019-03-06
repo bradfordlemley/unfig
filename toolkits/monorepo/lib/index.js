@@ -66,7 +66,7 @@ module.exports = (cfg => ({
       // });
       await execa(
         'lerna',
-        ['exec', '--concurrency', '1',]
+        ['exec']
           .concat(lernaFlags || [])
           .concat(unifigScopeArgs)
           .concat(['--', 'unfig', cmd].concat(args || [])),

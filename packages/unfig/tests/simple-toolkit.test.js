@@ -1,7 +1,6 @@
-const execa = require('execa');
-const fs = require('fs-extra');
 const path = require('path');
 const unfig = require('../lib');
+// eslint-disable-next-line node/no-unpublished-require
 const { verifyDir, withInitWorkspace } = require('@unfig/testutils');
 
 const toolkitPath = path.resolve(__dirname, "simple-toolkit/simple-toolkit");
@@ -9,13 +8,13 @@ const toolkitPath = path.resolve(__dirname, "simple-toolkit/simple-toolkit");
 let ws = null;
 withInitWorkspace(
   w => ws = w,
-  path.resolve(__dirname, '../../../__test-wkspcs__/simple-toolkit-'),
+  path.resolve(__dirname, '../__test-wkspcs__/simple-toolkit-'),
   toolkitPath,
   "",
   ["--no-install"]
 );
 
-test('includes dependencies', async () => {
+test('toolkit includes dependencies', async () => {
   const { dir } = ws;
   const toolkit = unfig.loadToolkit(dir);
   expect(toolkit.dependencies).toEqual({
@@ -26,13 +25,6 @@ test('includes dependencies', async () => {
   })
 });
 
-test('uses unfig from monorepo', async () => {
-  const { dir } = ws;
-  if (fs.existsSync(path.join(dir, 'node_modules', 'unfig'))) {
-    throw new Error(`Unfig exists in ${dir}/node_modules`)
-  }
-});
-
 test('creates files', async () => {
   const { dir } = ws;
   verifyDir(dir, [
@@ -40,7 +32,6 @@ test('creates files', async () => {
     '.unfig.js',
     'config2.js',
     'config3.js',
-    // 'node_modules',
     'package.json',
   ]);
 });

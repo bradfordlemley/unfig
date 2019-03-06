@@ -1,11 +1,12 @@
 // @flow
 const path = require('path');
-const { verifyCoverage, verifyEslintResults, verifyFilelist, verifyJestResults, initWorkspace, withInitWorkspace } = require('@unfig/testutils');
+// eslint-disable-next-line node/no-unpublished-require
+const { verifyCoverage, verifyEslintResults, verifyFilelist, verifyJestResults, withInitWorkspace } = require('@unfig/testutils');
 
-let ws = null;
+let ws;
 withInitWorkspace(
   w => ws = w,
-  path.resolve(__dirname, '../__test-wkspcs__/react-comp/success-'),
+  path.resolve(__dirname, '../__test-wkspcs__/success-'),
   path.resolve(__dirname, '../lib'),
   path.resolve(__dirname, '../fixtures/success'),
   ["--no-install"]

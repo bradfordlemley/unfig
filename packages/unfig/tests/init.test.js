@@ -1,6 +1,7 @@
 const execa = require('execa');
 const fs = require('fs-extra');
 const path = require('path');
+// eslint-disable-next-line node/no-unpublished-require
 const { verifyDir, createWorkspace } = require('@unfig/testutils');
 
 const unfigBin = path.resolve(__dirname, '../lib/cli.js');
@@ -11,7 +12,7 @@ const simplePlugin = path.resolve(
 
 let ws = null;
 beforeEach(() => {
-  ws = createWorkspace(path.resolve(__dirname, '../../../__test-wkspcs__/unfig/init-'))
+  ws = createWorkspace(path.resolve(__dirname, '../__test-wkspcs__/unfig/init-'))
 });
 afterEach(() => {
   ws && ws.clean();

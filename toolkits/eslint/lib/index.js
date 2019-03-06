@@ -1,5 +1,6 @@
 // @flow strict
-
+const fs = require('fs');
+// const path = require('path');
 /*::
 
 import type {CreatePlugin} from '@unfig/type-toolkit';
@@ -30,7 +31,7 @@ module.exports = (cfg => {
           //   .filter(dir => fs.existsSync(path.resolve(dir)))
           //   .map(dir => lintArgs.push(dir));
           args && lintArgs.push(...args);
-          dirs && lintArgs.push(...dirs);
+          dirs && lintArgs.push(...dirs.filter(dir => fs.existsSync(dir)));
           return env.run("eslint", lintArgs);
         }
       }

@@ -1,11 +1,11 @@
-
 const path = require('path');
+// eslint-disable-next-line node/no-unpublished-require
 const { withInitWorkspace, verifyEslintResults } = require('@unfig/testutils');
 
 let ws = null;
 withInitWorkspace(
   w => ws = w,
-  path.resolve(__dirname, '../__test-wkspcs__/react-comp/failLint-'),
+  path.resolve(__dirname, '../__test-wkspcs__/failLint-'),
   path.resolve(__dirname, '../lib'),
   path.resolve(__dirname, '../fixtures/failLint'),
   ["--no-install"]

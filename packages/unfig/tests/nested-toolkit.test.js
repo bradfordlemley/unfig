@@ -1,7 +1,6 @@
-const fs = require('fs-extra');
 const path = require('path');
 const unfig = require('../lib');
-
+// eslint-disable-next-line node/no-unpublished-require
 const { withInitWorkspace } = require('@unfig/testutils');
 
 const toolkitPath = path.resolve(__dirname, 'nested-toolkit/toolkit');
@@ -9,7 +8,7 @@ const toolkitPath = path.resolve(__dirname, 'nested-toolkit/toolkit');
 let ws = null;
 withInitWorkspace(
   w => ws = w,
-  path.resolve(__dirname, '../../../__test-wkspcs__/unfig/nested-toolkit-'),
+  path.resolve(__dirname, '../__test-wkspcs__/nested-toolkit-'),
   toolkitPath,
   "",
   ["--no-install"]

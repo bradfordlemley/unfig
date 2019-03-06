@@ -1,12 +1,11 @@
-
 const path = require('path');
-
+// eslint-disable-next-line node/no-unpublished-require
 const { withInitWorkspace, verifyJestResults } = require('@unfig/testutils');
 
 let ws = null;
 withInitWorkspace(
   w => ws = w,
-  path.resolve(__dirname, '../__test-wkspcs__/react-comp/failTest-'),
+  path.resolve(__dirname, '../__test-wkspcs__/failTest-'),
   path.resolve(__dirname, '../lib'),
   path.resolve(__dirname, '../fixtures/failTest'),
   ["--no-install"]
