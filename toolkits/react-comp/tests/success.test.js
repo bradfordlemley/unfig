@@ -5,7 +5,7 @@ const { verifyCoverage, verifyEslintResults, verifyFilelist, verifyJestResults, 
 let ws = null;
 withInitWorkspace(
   w => ws = w,
-  path.resolve(__dirname, '../../../__test-wkspcs__/react-comp/success-'),
+  path.resolve(__dirname, '../__test-wkspcs__/react-comp/success-'),
   path.resolve(__dirname, '../lib'),
   path.resolve(__dirname, '../fixtures/success'),
   ["--no-install"]
