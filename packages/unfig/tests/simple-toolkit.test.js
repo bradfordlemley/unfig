@@ -4,12 +4,27 @@ const path = require('path');
 const unfig = require('../lib');
 const { verifyDir, withInitWorkspace } = require('@unfig/testutils');
 
+const toolkitPath = path.resolve(__dirname, "simple-toolkit/simple-toolkit");
+
 let ws = null;
 withInitWorkspace(
   w => ws = w,
   path.resolve(__dirname, '../../../__test-wkspcs__/simple-toolkit-'),
-  path.resolve(__dirname, "simple-toolkit/simple-toolkit"),
+  toolkitPath,
+  "",
+  ["--no-install"]
 );
+
+test('includes dependencies', async () => {
+  const { dir } = ws;
+  const toolkit = unfig.loadToolkit(dir);
+  expect(toolkit.dependencies).toEqual({
+    eslint: {
+      toolkit: `${toolkitPath}.js`,
+      version: "5.10.0",
+    }
+  })
+});
 
 test('uses unfig from monorepo', async () => {
   const { dir } = ws;
@@ -25,7 +40,7 @@ test('creates files', async () => {
     '.unfig.js',
     'config2.js',
     'config3.js',
-    'node_modules',
+    // 'node_modules',
     'package.json',
   ]);
 });
@@ -33,10 +48,14 @@ test('creates files', async () => {
 test('gets cfg modules from toolkit', () => {
   const { dir } = ws;
   expect(unfig.getCfg(path.join(dir, '.config1.js'))).toEqual('config1');
-  expect(require(path.join(dir, '.config1.js'))).toEqual('config1');
   expect(unfig.getCfg(path.join(dir, 'config2.js'))).toEqual('config2');
-  expect(require(path.join(dir, 'config2.js'))).toEqual('config2');
   expect(unfig.getCfg(path.join(dir, 'config3.js'))).toEqual('config3');
+});
+
+test('gets cfg modules from file system', () => {
+  const { dir } = ws;
+  expect(require(path.join(dir, '.config1.js'))).toEqual('config1');
+  expect(require(path.join(dir, 'config2.js'))).toEqual('config2');
   expect(require(path.join(dir, 'config3.js'))).toEqual('config3');
 });
 
@@ -84,12 +103,19 @@ test('Failed call to run bubbles up as error', async () => {
   expect(error.stderr).toMatch(/Error: cmdD-throw-message/);
 });
 
-test('inits dependencies', async () => {
-  const { dir } = ws;
-  const pkgJson = fs.readJsonSync(path.join(dir, 'package.json'));
-  expect(pkgJson.devDependencies).toMatchObject({
-    eslint: "5.10.0"
-  });
+// test('inits dependencies', async () => {
+//   const { dir } = ws;
+//   const pkgJson = fs.readJsonSync(path.join(dir, 'package.json'));
+//   expect(pkgJson.devDependencies).toMatchObject({
+//     eslint: "5.10.0"
+//   });
+// });
+
+test('Toolkit', async () => {
+  const { execCmd } = ws;
+  await expect(execCmd(['command-x'])).rejects.toThrow(
+    /Command "command-x" is not available/
+  );
 });
 
 test('Throws on unhandled command', async () => {

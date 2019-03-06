@@ -4,7 +4,8 @@ const execa = require('execa');
 // $ExpectError: untyped module
 const yargs = require('yargs/yargs');
 const parseargs = require('./parseargs');
-const { getUnfig } = require('./toolkit');
+const getEnv = require('./env');
+const { loadToolkitFromEnv } = require('./toolkit');
 
 /*::
 import type {CommonModuleObject} from 'yargs';
@@ -27,7 +28,8 @@ module.exports = (
 
     const parseableArgs = [cmd].concat(cmdArgs.parseable);
 
-    const { env, unfig } = getUnfig(gArgv.rootDir || process.cwd(), gArgs);
+    const env = getEnv(gArgv.rootDir || process.cwd(), gArgs);
+    const toolkit = loadToolkitFromEnv(env);
 
     if (rebug) {
       resolve(
@@ -123,8 +125,8 @@ module.exports = (
 
     if (!INTERNAL_COMMANDS.includes(cmd)) {
       let commandFound = false;
-      if (unfig != null) {
-        const { commands } = unfig;
+      if (toolkit != null) {
+        const { commands } = toolkit;
         Object.keys(commands).forEach(key => {
           yCmd.command(wrapPluginCmd(key, commands[key]));
           if (key === cmd) {

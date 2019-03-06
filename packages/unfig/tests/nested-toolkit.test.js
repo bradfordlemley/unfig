@@ -4,29 +4,34 @@ const unfig = require('../lib');
 
 const { withInitWorkspace } = require('@unfig/testutils');
 
+const toolkitPath = path.resolve(__dirname, 'nested-toolkit/toolkit');
+
 let ws = null;
 withInitWorkspace(
   w => ws = w,
-  path.resolve(__dirname, '../../../__test-wkspcs__/nested-toolkit-'),
-  path.resolve(__dirname, 'nested-toolkit/toolkit'),
+  path.resolve(__dirname, '../../../__test-wkspcs__/unfig/nested-toolkit-'),
+  toolkitPath,
+  "",
+  ["--no-install"]
 );
 
-// beforeAll(async () => {
-//   const w = await initWorkspace(
-//     path.resolve(__dirname, '../../../__test-wkspcs__/nested-toolkit-'),
-//     path.resolve(__dirname, "nested-toolkit/toolkit"),
-//   );
-//   setWs(w)
-//   // await execa('yarn', {cwd: ws.dir});
-// }, 30000);
-
-// afterAll(async () => ws.clean())
-
-test('uses unfig from monorepo', async () => {
+test('includes dependencies', async () => {
   const { dir } = ws;
-  if (fs.existsSync(path.join(dir, 'node_modules', 'unfig'))) {
-    throw new Error(`Unfig exists in ${dir}/node_modules`)
-  }
+  const toolkit = unfig.loadToolkit(dir);
+  expect(toolkit.dependencies).toEqual({
+    babel: {
+      toolkit: `${toolkitPath}.js`,
+      version: "6.0.0",
+    },
+    eslint: {
+      toolkit: `${toolkitPath}.js`,
+      version: "5.10.0",
+    },
+    rimraf: {
+      toolkit: path.resolve(toolkitPath, "../nested-toolkit.js"),
+      version: "2.6.3",
+    },
+  })
 });
 
 test('Top config overrides child', () => {
@@ -82,12 +87,12 @@ test('Rejects non existing command', async () => {
   );
 });
 
-test('inits dependencies', async () => {
-  const { dir } = ws;
-  const pkgJson = fs.readJsonSync(path.join(dir, 'package.json'));
-  expect(pkgJson.devDependencies).toMatchObject({
-    eslint: "5.10.0",
-    babel: "6.0.0",
-    rimraf: "2.6.3",
-  });
-});
+// test('inits dependencies', async () => {
+//   const { dir } = ws;
+//   const pkgJson = fs.readJsonSync(path.join(dir, 'package.json'));
+//   expect(pkgJson.devDependencies).toMatchObject({
+//     eslint: "5.10.0",
+//     babel: "6.0.0",
+//     rimraf: "2.6.3",
+//   });
+// });

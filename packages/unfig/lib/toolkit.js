@@ -269,22 +269,28 @@ function loadPlugin(
   return makePlugin(nPlugin, toolkits, env);
 }
 
-function loadUnfig(filepath /*: string */, env /*: $ReadOnly<EnvType> */) {
-  // $ExpectError: dynamic require
-  const mod = require(filepath);
-  if (typeof mod === 'function') {
-    throw new Error(`Unfig module should not be a function, in ${filepath}`);
+function loadToolkitFromEnv(env /*: $ReadOnly<EnvType> */) {
+  if (!env.cfg) {
+    return undefined;
   }
-  mod.filepath = filepath;
+  const { cfgFile } = env.cfg;
+  // $ExpectError: dynamic require
+  const mod = require(cfgFile);
+  if (typeof mod === 'function') {
+    throw new Error(`Unfig module should not be a function, in ${cfgFile}`);
+  }
+  mod.filepath = cfgFile;
   return loadPlugin(mod, env, []);
 }
 
-function getUnfig(start /*: string */, gArgs /*: ?$ReadOnlyArray<string> */) {
+function loadToolkit(start /*: string */, gArgs /*: ?$ReadOnlyArray<string> */) {
   const env /*: $ReadOnly<EnvType> */ = getEnv(start, gArgs);
-  return {
-    unfig: env.cfg && loadUnfig(env.cfg.cfgFile, env),
-    env,
-  };
+  return loadToolkitFromEnv(env);
+  // return (env.cfg && env.cfg.cfgFile) ? loadInitialToolkit(env.cfg.cfgFile, env) : undefined;
+  // return {
+  //   unfig: env.cfg && loadInitialToolkit(env.cfg.cfgFile, env),
+  //   env,
+  // };
 }
 
 // function enumUnfig(
@@ -293,7 +299,7 @@ function getUnfig(start /*: string */, gArgs /*: ?$ReadOnlyArray<string> */) {
 // ) {
 //   let currDir = env.rootDir;
 //   for (;;) {
-//     const cfgMod = getUnfig(env);
+//     const cfgMod = loadToolkit(env);
 //     if (!cfgMod) {
 //       break;
 //     }
@@ -318,6 +324,7 @@ function writeConfig(
 }
 
 module.exports = {
-  getUnfig,
+  loadToolkit,
+  loadToolkitFromEnv,
   writeConfig,
 };

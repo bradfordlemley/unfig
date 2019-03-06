@@ -1,21 +1,19 @@
 
 const path = require('path');
 
-const { withWorkspaces, verifyJestResults } = require('@unfig/testutils');
+const { initWorkspace, verifyJestResults } = require('@unfig/testutils');
 
-const { initWorkspace } = withWorkspaces(
-  path.resolve(__dirname, '../../../__test-wkspcs__/react-comp')
-);
-
-let ws = null;
+let ws = {};
 beforeAll(async () => {
   ws = await initWorkspace(
+    path.resolve(__dirname, '../../../__test-wkspcs__/react-comp/failTest-'),
     path.resolve(__dirname, '../lib'),
     path.resolve(__dirname, '../fixtures/failTest'),
     ['--no-install'],
   );
 }, 30000);
 
+afterAll(() => ws && ws.clean());
 
 test('Detects failed test', async () => {
   const { dir, spawn } = ws;

@@ -14,6 +14,7 @@ function createWorkspaceDir(wkspcRoot) {
   return fs.mkdtempSync(path.resolve(wkspcRoot));
 }
 
+
 function makeWorkspaceUtils(dir /* :string */) {
   return {
     clean: () => fs.removeSync(dir),
@@ -28,15 +29,14 @@ function makeWorkspaceUtils(dir /* :string */) {
   };
 }
 
-async function initWorkspace(
-  workspaceRoot /* :string */,
+async function init(
+  workspaceDir /* :string */,
   toolkit /* :?string */,
   fixtureDir /* :?string */,
   initArgs /* : ?$ReadOnlyArray<string> */,
 ) /*  Promise<{ exec: any, execSync: any, cmd: any, dir: string }> */ {
-  const dir = createWorkspaceDir(workspaceRoot);
-  const ws = makeWorkspaceUtils(dir);
-  fixtureDir && fs.copySync(fixtureDir, dir);
+  const ws = makeWorkspaceUtils(workspaceDir);
+  fixtureDir && fs.copySync(fixtureDir, ws.dir);
   const pkgFile = path.join(ws.dir, 'package.json');
   if (fs.existsSync(pkgFile)) {
     const pkgJson = fs.readJsonSync(pkgFile);
@@ -53,58 +53,66 @@ async function initWorkspace(
   return ws;
 }
 
-async function createWorkspace(
+async function create(
   workspaceRoot /* :string */,
   toolkit /* :?string */,
   fixtureDir /* :?string */,
+  initArgs /* : ?$ReadOnlyArray<string> */,
 ) /*  Promise<{ exec: any, execSync: any, cmd: any, dir: string }> */ {
   const dir = createWorkspaceDir(workspaceRoot)
   const ws = makeWorkspaceUtils(dir);
 
   const args = ['create', dir]
-    .concat(toolkit ? ['--toolkit', toolkit]: []);
+    .concat(toolkit ? ['--toolkit', toolkit]: [])
+    .concat(initArgs || []);
 
   await ws.execCmd(args);
   fixtureDir && fs.copySync(fixtureDir, dir);
   return ws;
 }
 
-function withInitWorkspace(
-  setWs,
+function createWorkspace(workspaceRoot /* :string */) {
+  const dir = createWorkspaceDir(workspaceRoot);
+  const ws = makeWorkspaceUtils(dir);
+  return {
+    ...ws,
+    init: (toolkit /* :?string */, fixtureDir /* :?string */, initArgs /* : ?$ReadOnlyArray<string> */) => 
+      init(ws.dir, toolkit, fixtureDir, initArgs),
+    create: (toolkit /* :?string */, fixtureDir /* :?string */, initArgs /* : ?$ReadOnlyArray<string> */) => 
+      create(ws.dir, toolkit, fixtureDir, initArgs)
+  }
+}
+
+async function withWorkspace(
+  workspaceRoot /* :string */,
+  setWs /*: (any) => any */,
+) /*  Promise<{ exec: any, execSync: any, cmd: any, dir: string }> */ {
+  let ws;
+
+  beforeAll(async () => {
+    ws = createWorkspace(workspaceRoot);
+    await setWs(ws);
+  }, 30000);
+  
+  afterAll(() => ws && ws.clean());
+
+}
+
+async function withInitWorkspace(
+  setWs /*: (any) => any */,
   workspaceRoot /* :string */,
   toolkit /* :?string */,
   fixtureDir /* :?string */,
   initArgs /* : ?$ReadOnlyArray<string> */,
 ) /*  Promise<{ exec: any, execSync: any, cmd: any, dir: string }> */ {
-  let w;
-  beforeAll(async () => {
-    w = await initWorkspace(workspaceRoot, toolkit, fixtureDir, initArgs);
-    setWs(w)
-    // await execa('yarn', {cwd: ws.dir});
-  }, 30000);
-  
-  afterAll(async () => w.clean())
+  withWorkspace(workspaceRoot, async (ws) => {
+    await ws.init(toolkit, fixtureDir, initArgs);
+    await setWs(ws);
+  })
 }
-
-// function withWorkspace(workspaceRoot /* :string */) {
-//   afterAll(async () => {
-//     workspaceRoot && (await fs.emptyDir(workspaceRoot));
-//   });
-
-//   const dir = createWorkspaceDir(workspaceRoot);
-
-//   return {
-//     createWorkspace: (toolkit /* :string */, fixtureDir /* :string */ = '') => {
-//       return createWorkspace(dir, toolkit, fixtureDir)
-//     },
-//     initWorkspace: (toolkit /* :string */, fixtureDir /* :string */ = '', initArgs /* : ?$ReadOnlyArray<string> */) => {
-//       return initWorkspace(dir, toolkit, fixtureDir, initArgs)
-//     },
-//   };
-// }
 
 module.exports = {
   createWorkspace,
-  initWorkspace,
   withInitWorkspace,
+  withWorkspace,
 };

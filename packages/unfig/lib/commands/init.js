@@ -4,7 +4,7 @@ const path = require('path');
 const chalk = require('chalk');
 const inquirer = require('inquirer');
 const { genFromFile, templateDir } = require('../templates');
-const { writeConfig, getUnfig } = require('../toolkit');
+const { writeConfig, loadToolkit } = require('../toolkit');
 
 /*::
 
@@ -129,7 +129,7 @@ const init = (async function init({ env, argv, args }) {
     writeConfig(targetFile, { toolkit: removeVersion(toolkit) });
   }
 
-  const { unfig } = getUnfig(targetDir);
+  const unfig = loadToolkit(targetDir);
 
   if (unfig && unfig.modules) {
     Object.keys(unfig.modules).forEach(file => {
