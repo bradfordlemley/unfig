@@ -48,6 +48,7 @@ async function createConfigFile(
     ...(opts.unfigModule ? { unfigModule: opts.unfigModule } : {}),
     ...templateVarOverrides,
   };
+  templateVars.unfigModule = templateVars.unfigModule.replace(/\\/g, '\\\\');
   const content = genFromFile(templateFile, templateVars);
   let create = true;
   if (fs.existsSync(targetFile)) {
@@ -126,7 +127,9 @@ const init = (async function init({ env, argv, args }) {
     if (!isPath(toolkit)) {
       await env.run('yarn', ['add', '--dev', toolkit]);
     }
-    writeConfig(targetFile, { toolkit: removeVersion(toolkit) });
+    writeConfig(targetFile, {
+      toolkit: removeVersion(toolkit).replace(/\\/g, '\\\\')
+    });
   }
 
   const unfig = loadToolkit(targetDir);
