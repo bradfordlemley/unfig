@@ -61,12 +61,12 @@ module.exports = (cfg => ({
         unifigScopeArgs.push('--scope');
         unifigScopeArgs.push(pkg.pkgJson.name);
       });
-      await execa('lerna', ['run', cmd], {
-        stdio: 'inherit',
-      });
+      // await execa('lerna', ['run', '--concurrency', '1', cmd], {
+      //   stdio: 'inherit',
+      // });
       await execa(
         'lerna',
-        ['exec']
+        ['exec', '--concurrency', '1',]
           .concat(lernaFlags || [])
           .concat(unifigScopeArgs)
           .concat(['--', 'unfig', cmd].concat(args || [])),
@@ -124,6 +124,10 @@ module.exports = (cfg => ({
           },
         },
         run: {
+          describe: 'Run command on all packages in monorepo',
+          handler: ({ args }) => runCommand(args[0]),
+        },
+        runC: {
           describe: 'Run command on all packages in monorepo',
           handler: ({ args }) => runCommand(args[0]),
         },

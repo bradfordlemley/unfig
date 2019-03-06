@@ -2,29 +2,24 @@ const execa = require('execa');
 const fs = require('fs-extra');
 const path = require('path');
 const unfig = require('../lib');
-const { verifyDir, withWorkspaces } = require('@unfig/testutils');
+const { verifyDir, withInitWorkspace } = require('@unfig/testutils');
 
-const { initWorkspace } = withWorkspaces(
-  path.resolve(__dirname, '../../../__test-wkspcs__/simple-toolkit')
+let ws = null;
+withInitWorkspace(
+  w => ws = w,
+  path.resolve(__dirname, '../../../__test-wkspcs__/simple-toolkit-'),
+  path.resolve(__dirname, "simple-toolkit/simple-toolkit"),
 );
 
-let ws = null, execCmd = null, dir = null;
-beforeAll(async () => {
-  ws = await initWorkspace(
-    path.resolve(__dirname, "simple-toolkit/simple-toolkit")
-  );
-  await execa('yarn', {cwd: ws.dir});
-  ({execCmd, dir} = ws);
-}, 30000);
-
-
 test('uses unfig from monorepo', async () => {
+  const { dir } = ws;
   if (fs.existsSync(path.join(dir, 'node_modules', 'unfig'))) {
     throw new Error(`Unfig exists in ${dir}/node_modules`)
   }
 });
 
 test('creates files', async () => {
+  const { dir } = ws;
   verifyDir(dir, [
     '.config1.js',
     '.unfig.js',
@@ -36,6 +31,7 @@ test('creates files', async () => {
 });
 
 test('gets cfg modules from toolkit', () => {
+  const { dir } = ws;
   expect(unfig.getCfg(path.join(dir, '.config1.js'))).toEqual('config1');
   expect(require(path.join(dir, '.config1.js'))).toEqual('config1');
   expect(unfig.getCfg(path.join(dir, 'config2.js'))).toEqual('config2');
@@ -45,6 +41,7 @@ test('gets cfg modules from toolkit', () => {
 });
 
 test('throws on unhandled file', () => {
+  const { dir } = ws;
   expect(() => unfig.getCfg(path.join(dir, '.config100.js'))).toThrow(
     /File .config100.js .+ is not supported/
   );
@@ -55,6 +52,7 @@ test('throws on unhandled file', () => {
 });
 
 test('executes commands from toolkit', async () => {
+  const { execCmd } = ws;
   const result = await execCmd(['test']);
   expect(result).toEqual('this is a test');
 
@@ -66,6 +64,7 @@ test('executes commands from toolkit', async () => {
 });
 
 test('Toolkit calls run to execute another unfig command', async () => {
+  const { execCmd } = ws;
   await expect(execCmd(['cmdA'])).resolves.toMatchObject({
     code: 0,
     stdout: 'CmdB-message',
@@ -73,6 +72,7 @@ test('Toolkit calls run to execute another unfig command', async () => {
 });
 
 test('Failed call to run bubbles up as error', async () => {
+  const { execCmd } = ws;
   let error = null;
   await execCmd(['cmdC']).catch(err => {
     error = err;
@@ -85,7 +85,7 @@ test('Failed call to run bubbles up as error', async () => {
 });
 
 test('inits dependencies', async () => {
-
+  const { dir } = ws;
   const pkgJson = fs.readJsonSync(path.join(dir, 'package.json'));
   expect(pkgJson.devDependencies).toMatchObject({
     eslint: "5.10.0"
@@ -93,16 +93,19 @@ test('inits dependencies', async () => {
 });
 
 test('Throws on unhandled command', async () => {
+  const { execCmd } = ws;
   await expect(execCmd(['command-x'])).rejects.toThrow(
     /Command "command-x" is not available/
   );
 });
 
 test('Throws on no args', async () => {
+  const { execCmd } = ws;
   await expect(execCmd([])).rejects.toThrow(/No command found in/);
 });
 
 test('Throws on args, but no command', async () => {
+  const { execCmd } = ws;
   await expect(execCmd(['--fruit'])).rejects.toThrow(
     /Unrecognized global arg: --fruit/
   );

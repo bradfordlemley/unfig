@@ -16,6 +16,7 @@ function createWorkspaceDir(wkspcRoot) {
 
 function makeWorkspaceUtils(dir /* :string */) {
   return {
+    clean: () => fs.removeSync(dir),
     dir,
     spawn: (args /* :Array<string> */) =>
       execa('unfig', args, { cwd: dir, reject: false }),
@@ -28,63 +29,82 @@ function makeWorkspaceUtils(dir /* :string */) {
 }
 
 async function initWorkspace(
-  workspaceDir /* :string */,
+  workspaceRoot /* :string */,
   toolkit /* :?string */,
   fixtureDir /* :?string */,
   initArgs /* : ?$ReadOnlyArray<string> */,
 ) /*  Promise<{ exec: any, execSync: any, cmd: any, dir: string }> */ {
-  const ws = makeWorkspaceUtils(workspaceDir);
-  fixtureDir && fs.copySync(fixtureDir, workspaceDir);
+  const dir = createWorkspaceDir(workspaceRoot);
+  const ws = makeWorkspaceUtils(dir);
+  fixtureDir && fs.copySync(fixtureDir, dir);
   const pkgFile = path.join(ws.dir, 'package.json');
   if (fs.existsSync(pkgFile)) {
     const pkgJson = fs.readJsonSync(pkgFile);
     pkgJson.name = path.basename(ws.dir);
+    pkgJson.version = pkgJson.version || "0.0.1";
     fs.writeJsonSync(pkgFile, pkgJson);
   } else {
     fs.writeJsonSync(pkgFile, {name: path.basename(ws.dir), version: "0.0.1"});
   }
-  let args = ['init', '--no-prompt'];
-  if (toolkit) {
-    args = args.concat(['--toolkit', toolkit]);
-    args = args.concat(initArgs || []);
-  }
+  const args = ['init']
+    .concat(toolkit ? ['--toolkit', toolkit] : [])
+    .concat(initArgs || []);
   await ws.execCmd(args);
   return ws;
 }
 
 async function createWorkspace(
-  workspaceDir /* :string */,
+  workspaceRoot /* :string */,
   toolkit /* :?string */,
   fixtureDir /* :?string */,
 ) /*  Promise<{ exec: any, execSync: any, cmd: any, dir: string }> */ {
-  const workspace = makeWorkspaceUtils(workspaceDir);
-  let args = ['create', workspaceDir, '--no-prompt'];
-  if (toolkit) {
-    args = args.concat(['--toolkit', toolkit]);
-  }
-  // $ExpectError: not flow strict
-  await require("unfig").execCmd(args);
-  fixtureDir && fs.copySync(fixtureDir, workspaceDir);
-  return workspace;
+  const dir = createWorkspaceDir(workspaceRoot)
+  const ws = makeWorkspaceUtils(dir);
+
+  const args = ['create', dir]
+    .concat(toolkit ? ['--toolkit', toolkit]: []);
+
+  await ws.execCmd(args);
+  fixtureDir && fs.copySync(fixtureDir, dir);
+  return ws;
 }
 
-function withWorkspaces(workspaceRoot /* :string */) {
-  afterAll(async () => {
-    workspaceRoot && (await fs.emptyDir(workspaceRoot));
-  });
-
-  return {
-    createWorkspace: (toolkit /* :string */, fixtureDir /* :string */ = '') => {
-      const dir = createWorkspaceDir(path.join(workspaceRoot, `${path.basename(fixtureDir)}-`));
-      return createWorkspace(dir, toolkit, fixtureDir)
-    },
-    initWorkspace: (toolkit /* :string */, fixtureDir /* :string */ = '', initArgs /* : ?$ReadOnlyArray<string> */) => {
-      const dir = createWorkspaceDir(path.join(workspaceRoot, `${path.basename(fixtureDir)}-`));
-      return initWorkspace(dir, toolkit, fixtureDir, initArgs)
-    },
-  };
+function withInitWorkspace(
+  setWs,
+  workspaceRoot /* :string */,
+  toolkit /* :?string */,
+  fixtureDir /* :?string */,
+  initArgs /* : ?$ReadOnlyArray<string> */,
+) /*  Promise<{ exec: any, execSync: any, cmd: any, dir: string }> */ {
+  let w;
+  beforeAll(async () => {
+    w = await initWorkspace(workspaceRoot, toolkit, fixtureDir, initArgs);
+    setWs(w)
+    // await execa('yarn', {cwd: ws.dir});
+  }, 30000);
+  
+  afterAll(async () => w.clean())
 }
+
+// function withWorkspace(workspaceRoot /* :string */) {
+//   afterAll(async () => {
+//     workspaceRoot && (await fs.emptyDir(workspaceRoot));
+//   });
+
+//   const dir = createWorkspaceDir(workspaceRoot);
+
+//   return {
+//     createWorkspace: (toolkit /* :string */, fixtureDir /* :string */ = '') => {
+//       return createWorkspace(dir, toolkit, fixtureDir)
+//     },
+//     initWorkspace: (toolkit /* :string */, fixtureDir /* :string */ = '', initArgs /* : ?$ReadOnlyArray<string> */) => {
+//       return initWorkspace(dir, toolkit, fixtureDir, initArgs)
+//     },
+//   };
+// }
 
 module.exports = {
-  withWorkspaces,
+  createWorkspace,
+  initWorkspace,
+  withInitWorkspace,
 };
