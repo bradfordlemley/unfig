@@ -17,7 +17,7 @@ withInitWorkspace(
 test('includes dependencies', async () => {
   const { dir } = ws;
   const toolkit = unfig.loadToolkit(dir);
-  expect(toolkit.dependencies).toEqual({
+  expect(toolkit.toolDependencies).toEqual({
     babel: {
       toolkit: `${toolkitPath}.js`,
       version: "6.0.0",
@@ -85,13 +85,3 @@ test('Rejects non existing command', async () => {
     /Command "cmd-100" is not available, use --help for usage/
   );
 });
-
-// test('inits dependencies', async () => {
-//   const { dir } = ws;
-//   const pkgJson = fs.readJsonSync(path.join(dir, 'package.json'));
-//   expect(pkgJson.devDependencies).toMatchObject({
-//     eslint: "5.10.0",
-//     babel: "6.0.0",
-//     rimraf: "2.6.3",
-//   });
-// });

@@ -5,10 +5,6 @@ import type {CreatePlugin} from '@unfig/type-toolkit';
 */
 
 module.exports = (() => ({
-  dependencies: {
-    babel: "6.23.0",
-    rimraf: "2.6.3",
-  },
   modules: {
     'config1.js': () => 'nested-config1',
     'config5.js': () => 'nested-config5',
@@ -34,5 +30,9 @@ module.exports = (() => ({
       },
     },
   }),
+  toolDependencies: {
+    babel: "6.23.0",
+    rimraf: "2.6.3",
+  },
   filepath: __filename,
 }) /*:CreatePlugin<{}> */);

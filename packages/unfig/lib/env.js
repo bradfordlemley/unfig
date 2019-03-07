@@ -44,8 +44,7 @@ module.exports = (
         ...opts,
       };
       // console.log(`Running ${jsBin} ${cArgs.join(" ")}`);
-      console.log(`resolved: ${resolvedJsBin}`)
-
+      // console.log(`resolved: ${resolvedJsBin}`)
       return (nodeArgs && nodeArgs.length
         ? execa('node', nodeArgs.concat([resolvedJsBin]).concat(cArgs), sOpts)
         : execa(resolvedJsBin, cArgs, sOpts)

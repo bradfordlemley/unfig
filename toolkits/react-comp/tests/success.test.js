@@ -14,8 +14,12 @@ withInitWorkspace(
 
 test('toolkit includes dependencies', async () => {
   const { dir } = ws;
+  // eslint-disable-next-line node/no-unpublished-require
   const toolkit = require('unfig').loadToolkit(dir);
-  expect(Object.keys(toolkit.dependencies)).toEqual([
+  if (!toolkit) {
+    throw new Error(`Could not get toolkit`)
+  }
+  expect(Object.keys(toolkit.toolDependencies)).toEqual([
     "@babel/cli",
     "@babel/core",
     "@babel/plugin-proposal-class-properties",

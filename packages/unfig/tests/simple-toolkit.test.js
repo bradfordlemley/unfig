@@ -17,7 +17,7 @@ withInitWorkspace(
 test('toolkit includes dependencies', async () => {
   const { dir } = ws;
   const toolkit = unfig.loadToolkit(dir);
-  expect(toolkit.dependencies).toEqual({
+  expect(toolkit.toolDependencies).toEqual({
     eslint: {
       toolkit: `${toolkitPath}.js`,
       version: "5.10.0",

@@ -11,7 +11,7 @@ import {type PkgJson} from '@unfig/type-pkg-json';
 import type { Plugin, LoadedPlugin, GetModuleHandler, Command, EnvType } from '@unfig/type-toolkit';
 
 type NormalizedPluginType = {|
-  dependencies: { [string] : string},
+  toolDependencies: { [string] : string},
   toolkits: Array<Plugin>,
   modules: {
     [string]: GetModuleHandler<>,
@@ -53,7 +53,7 @@ function makePlugin(
   }
   function seedDependencies(dependencies) {
     const out = {};
-    Object.keys(dependencies).forEach(key => {
+    dependencies && Object.keys(dependencies).forEach(key => {
       out[key] = {
         version: dependencies[key],
         toolkit: base.filepath,
@@ -62,7 +62,7 @@ function makePlugin(
     return out;
   }
   const toolkit = {
-    dependencies: seedDependencies(base.dependencies),
+    toolDependencies: seedDependencies(base.toolDependencies),
     filepath: base.filepath,
     modules: seedModules(base.modules),
     commands: seedCommands(base.commands),
@@ -137,7 +137,7 @@ function makePlugin(
   toolkits.forEach(p => {
     p.commands && mergeObj(toolkit.commands, p.commands);
     p.modules && mergeObj(toolkit.modules, p.modules);
-    p.dependencies && mergeObj(toolkit.dependencies, p.dependencies);
+    p.toolDependencies && mergeObj(toolkit.toolDependencies, p.toolDependencies);
   });
 
   return toolkit;
@@ -190,8 +190,23 @@ const unfigDepRegex = /@?unfig/;
 
 function filterDeps(deps) {
   const d = {};
-  Object.keys(deps).filter(dep => !dep.match(unfigDepRegex)).forEach(dep => d[dep] = deps[dep]);
+  deps && Object.keys(deps).filter(dep => !dep.match(unfigDepRegex)).forEach(dep => d[dep] = deps[dep]);
   return d;
+}
+
+function getToolDeps(toolDeps, pkg) /*: { [string]: string }*/ {
+  if (typeof toolDeps === 'boolean') {
+    return toolDeps
+      ? filterDeps(pkg && pkg.pkgJson && pkg.pkgJson.devDependencies)
+      : {}
+  }
+  if (typeof toolDeps === 'function') {
+    return toolDeps(pkg)
+  }
+  if (typeof toolDeps === 'object') {
+    return (toolDeps /*: {[string]: string} */ );
+  }
+  return {};
 }
 
 function preloadPlugin(
@@ -200,13 +215,8 @@ function preloadPlugin(
 ) /* :NormalizedPluginType */ {
   const toolkits = toolkit.toolkits ? stripArr(toolkit.toolkits) : [];
   const pkg = findPkg(toolkit.filepath);
-  const dependencies = toolkit.dependencies === true
-    ? filterDeps(pkg.pkgJson.devDependencies)
-    : (typeof toolkit.dependencies === 'function')
-      ? toolkit.dependencies(pkg)
-      : (toolkit.dependencies || {});
   const preloaded = {
-    dependencies,
+    toolDependencies: getToolDeps(toolkit.toolDependencies, pkg),
     filepath: toolkit.filepath,
     modules: stripObj(toolkit.modules),
     commands: stripObj(toolkit.commands),
@@ -215,11 +225,11 @@ function preloadPlugin(
 
   if (toolkit.load) {
     const loadedParts = toolkit.load(env);
-    const { modules, commands, dependencies } = loadedParts;
+    const { modules, commands, toolDependencies } = loadedParts;
 
     mergeObj(preloaded.modules, modules);
     mergeObj(preloaded.commands, commands);
-    mergeObj(preloaded.dependencies, dependencies);
+    mergeObj(preloaded.toolDependencies, getToolDeps(toolDependencies, pkg));
 
     if (loadedParts.toolkits) {
       preloaded.toolkits = preloaded.toolkits.concat(

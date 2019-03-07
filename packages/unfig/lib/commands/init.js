@@ -142,10 +142,10 @@ const init = (async function init({ env, argv, args }) {
     });
   }
 
-  if (!noInstall && unfig && unfig.dependencies) {
+  if (!noInstall && unfig && unfig.toolDependencies) {
     const deps = [];
-    Object.keys(unfig.dependencies).forEach(dep => {
-      const version = unfig.dependencies[dep].version;
+    Object.keys(unfig.toolDependencies).forEach(dep => {
+      const version = unfig.toolDependencies[dep].version;
       deps.push(`${dep}${version ? `@${version}` : ""}`)
     });
     if (deps.length) {

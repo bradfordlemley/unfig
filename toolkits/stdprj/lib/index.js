@@ -28,7 +28,7 @@ module.exports = (cfg => ({
     return {
       toolkits: [
         require('@unfig/toolkit-eslint')({
-          dirs: [stdCfg.srcDir, stdCfg.testDir],
+          dirs: [stdCfg.srcDir].concat(stdCfg.testDir || []),
           exts: stdCfg.jsSrcExts,
           ignoreDirs,
           eslintCfg: eslintCfg,

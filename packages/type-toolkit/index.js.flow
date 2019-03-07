@@ -71,7 +71,7 @@ export type PluginBase = {|
   commands?: {
     [string]: ?Command | false,
   },
-  dependencies?: {
+  toolDependencies?: boolean | {
     [string]: string,
   }
 |};
@@ -106,7 +106,7 @@ export type LoadedPlugin = {|
   commands: {
     [string]: LoadedCmd,
   },
-  dependencies: {
+  toolDependencies: {
     [string]: LoadedDependency,
   },
   execCmd: (cmd: string, args: ?$ReadOnlyArray<string>) => Promise<CommandResult>,
