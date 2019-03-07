@@ -1,4 +1,5 @@
 // @flow
+const findPkg = require('@unfig/find-pkg');
 const fs = require('fs-extra');
 const path = require('path');
 const { genFromFile, templateDir } = require('./templates');
@@ -185,13 +186,27 @@ function mergeObj /*:: <T> */(
     });
 }
 
+const unfigDepRegex = /@?unfig/;
+
+function filterDeps(deps) {
+  const d = {};
+  Object.keys(deps).filter(dep => !dep.match(unfigDepRegex)).forEach(dep => d[dep] = deps[dep]);
+  return d;
+}
+
 function preloadPlugin(
   toolkit /* :$ReadOnly<Plugin> */,
   env
 ) /* :NormalizedPluginType */ {
   const toolkits = toolkit.toolkits ? stripArr(toolkit.toolkits) : [];
+  const pkg = findPkg(toolkit.filepath);
+  const dependencies = toolkit.dependencies === true
+    ? filterDeps(pkg.pkgJson.devDependencies)
+    : (typeof toolkit.dependencies === 'function')
+      ? toolkit.dependencies(pkg)
+      : (toolkit.dependencies || {});
   const preloaded = {
-    dependencies: toolkit.dependencies || {},
+    dependencies,
     filepath: toolkit.filepath,
     modules: stripObj(toolkit.modules),
     commands: stripObj(toolkit.commands),

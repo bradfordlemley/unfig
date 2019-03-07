@@ -12,6 +12,30 @@ withInitWorkspace(
   ["--no-install"]
 );
 
+test('toolkit includes dependencies', async () => {
+  const { dir } = ws;
+  const toolkit = require('unfig').loadToolkit(dir);
+  expect(Object.keys(toolkit.dependencies)).toEqual([
+    "@babel/cli",
+    "@babel/core",
+    "@babel/plugin-proposal-class-properties",
+    "@babel/plugin-proposal-object-rest-spread",
+    "@babel/preset-env",
+    "@babel/preset-flow",
+    "@babel/preset-react",
+    "@babel/preset-typescript",
+    "babel-core",
+    "babel-eslint",
+    "babel-jest",
+    "eslint",
+    "eslint-plugin-flowtype",
+    "eslint-plugin-jsx-a11y",
+    "eslint-plugin-react",
+    "jest",
+    "rollup",
+  ])
+});
+
 test('Shows help', async () => {
   const { spawn } = ws;
   const out = await spawn(['--help']);

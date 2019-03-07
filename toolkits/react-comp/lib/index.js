@@ -11,6 +11,7 @@ export type ReactCompPluginCfg = {|
 */
 
 module.exports = (() => ({
+  dependencies: true,
   toolkits: [
     require('@unfig/toolkit-stdprj')({
       babelCfg: () => require('./configs/babel-config'),
