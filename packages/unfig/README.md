@@ -1,40 +1,48 @@
 # unfig
 
-**`unfig`** is a **_framework_** for creating toolkits.
+**`unfig`** is a **_framework_** for toolkits.
 
-- **`unfig` toolkits** can **provide** commands, e.g. `build`.
-- **`unfig` toolkits** can **provide** or **modify** tool configurations, e.g. `.babelrc.js`.
-- **`unfig` toolkits** can **extend** other **`unfig`** toolkits.
-- **`unfig` toolkits** can be **configured**.
+[Existing toolkits](#Existing_Toolkits) lack sufficient functionality, extendability, and customizability.
 
-The **`unfig`** philosophy is that toolkits **_should_** provide **_everything_** needed to develop and maintain **_quality_** projects.
+A **framework** that supports these features can enable a proliferation of **_quality_** **_full-featured_** **toolkits**.
 
-The theory is that a **framework** that supports these features can enable a proliferation of **quality** **_full-featured_** toolkits which simply don't exist today.
+## Features
+**Functionality**: **`unfig` toolkits** provide `commands` and `configurations`.
+* `commands` are invoked by the user and can do **_anything_**, e.g. `unfig build`.
+* `configurations` are tool configurations, e.g. `.babelrc.js`.
+* The **`unfig`** philosophy is that toolkits should provide **_all_** functionality needed to develop and maintain **_quality_** projects.
+
+**Extendability**: **`unfig` toolkits** can extend other **`unfig` toolkits**.
+* Any **`unfig` toolkit** can be used as a plugin for another **`unfig` toolkit**.
+
+**Configurability**: **`unfig` toolkits** can be **configured**.
+* **`unfig` toolkits** work out of the box, but can be configured.
+
+**Customizability**: **`unfig` toolkits** can be **customized**.
+* **`unfig`** recognizes that despite many similarities, every project might be different.
 
 ## Usage
 
+#### Install
 An **`unfig` toolkit** can be installed with the following commands:
 
-**`npx unfig create [dir] [--toolkit=<toolkit-package>]`**
+**`npx unfig create [dir] [--toolkit=<package>]`**
 Create a new project using the specified toolkit. (User will be queried for dir and toolkit if not provided.)
 
-**`npx unfig init [--toolkit=<toolkit-package>]`**
+**`npx unfig init [--toolkit=<package>]`**
 Use specified toolkit in an existing project. (User will be queried for toolkit if not provided.)
 
+#### Other
 **`npx unfig help`**
 Show usage for **`unfig`** commands and any installed toolkit.
 
-Additional commands provided by the toolkit are shown in `help`, or can be found in the specific toolkit documentation.
+**`commands`** provided by the toolkit are shown in **`help`**.
 
 ## Creating Toolkits
 
-Toolkits are easy to create and share.
+An **`unfig` toolkit** is a javascript function that (optionally) takes configuration and provides `commands` and `configurations` and `toolDependencies`.
 
-- **`unfig` toolkits** can provide `commands` and tool `configurations`.
-
-- **`unfig` toolkits** can be configured.
-
-- **`unfig` toolkits** can use and configure other toolkits.
+**`unfig` toolkits** can use other **`unfig` toolkits** and can configure them, modify and cusomize their `commands` and `configurations`.
 
 The following example demonstrates all of these features.
 
@@ -99,6 +107,7 @@ module.exports = cfg => {
 };
 ```
 
+#### Using Example Toolkit
 A project could use `toolkit-2` by running `npx unfig init --toolkit toolkit-2`.
 
 The project would then contain `config-1.js` and `config-2.js`. See [configurations](#configurations) section for more info.
@@ -109,11 +118,7 @@ The user could invoke `cmd-2` by running `npx unfig cmd-2`.
 
 ## Toolkit Api
 
-Toolkit `commands` and `configurations` provide functionality via `handler` functions.
-
-The **`unfig`** framework calls the `handler` function with an argument that includes information on the environment, handler-specific arguments, and helpers that can be used to access other toolkits.
-
-The full flow definition for the handler arguments can be found [here](github://bradfordlemley/unfig/type-toolkit).
+The flow definition for the handler arguments can be found [here](github://bradfordlemley/unfig/type-toolkit).
 
 ## Real Toolkits
 
