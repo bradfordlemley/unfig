@@ -2,61 +2,65 @@
 
 **`unfig`** is a **_framework_** for toolkits.
 
-[Existing toolkits](#Existing_Toolkits) lack sufficient functionality, extendability, and customizability.
+* **`unfig`** naturally supports **modularity**, **extendability**, **customizability**, and **configurability**.
 
-A **framework** that supports these features can enable a proliferation of **_quality_** **_full-featured_** **toolkits**.
+* **`unfig`** makes no presumptions about what functionality toolkits provide.
 
-## Features
-**Functionality**: **`unfig` toolkits** provide `commands` and `configurations`.
-* `commands` are invoked by the user and can do **_anything_**, e.g. `unfig build`.
-* `configurations` are tool configurations, e.g. `.babelrc.js`.
-* The **`unfig`** philosophy is that toolkits should provide **_all_** functionality needed to develop and maintain **_quality_** projects.
+The **`unfig`** philosophy is that toolkits should enable developers to quickly set up projects and support **_everything_** needed to develop and maintain **_quality_** projects, much more functionality than is typically included in [current-generation toolkits](#Current-generation_Toolkits).
 
-**Extendability**: **`unfig` toolkits** can extend other **`unfig` toolkits**.
-* Any **`unfig` toolkit** can be used as a plugin for another **`unfig` toolkit**.
+* The challenge is that, despite many similarties, every project can be different and developers don't want to be locked in to a toolkit.
 
-**Configurability**: **`unfig` toolkits** can be **configured**.
-* **`unfig` toolkits** work out of the box, but can be configured.
+The **`unfig`** theory is that a **framework** that naturally supports these features can enable a proliferation of **_quality_** **_full-featured_** **toolkits**.
+* Projects can adopt toolkits without concern of lock-in because escape hatches are built in.
+* Toolkits can evolve quickly to enable projects of the future because new toolkits can be easily be built from pulling in functionality from existing toolkits.
 
-**Customizability**: **`unfig` toolkits** can be **customized**.
-* **`unfig`** recognizes that despite many similarities, every project might be different.
+## Overview
+ 
+The **`unfig`** framework is simple.  All functionality comes from **`toolkits`**.
+
+**`unfig` toolkits** provide:
+* **`commands`**, which can be invoked by the user, like `build`.
+* **`configurations`**, which are tool configurations, like `.babelrc.js`.
+* **`dependencies`**, which are tools used by the toolkit, like `babel`.
+
+The **`unfig`** framework enables toolkits to utilize other toolkits -- to configure them and inherit their functionality, and/or customize their **`commands`**, **`configurations`**, and **`dependencies`**.
+
+The **`unfig`** framework essentially hoists **`configurations`**, and **`dependencies`** into the project level.  This means a project directly contains standard configuration files which integrate seemlessly with tools in the ecosystem and also ultimately relinquishes control to the project itself.
 
 ## Usage
 
-#### Install
-An **`unfig` toolkit** can be installed with the following commands:
+End users can use a **toolkit** in their project invoking one of the commands below.
 
-**`npx unfig create [dir] [--toolkit=<package>]`**
+**`npx unfig create [dir] [--toolkit=<toolkit>]`**
 Create a new project using the specified toolkit. (User will be queried for dir and toolkit if not provided.)
 
-**`npx unfig init [--toolkit=<package>]`**
+**`npx unfig init [--toolkit=<toolkit>]`**
 Use specified toolkit in an existing project. (User will be queried for toolkit if not provided.)
 
-#### Other
-**`npx unfig help`**
-Show usage for **`unfig`** commands and any installed toolkit.
+Other **`commands`**, which are provided by the **toolkit**, are shown in **`unfig help`**.
 
-**`commands`** provided by the toolkit are shown in **`help`**.
+## Toolkits
 
-## Creating Toolkits
+An **`unfig` toolkit** is a javascript function that takes a configuration object and returns an object with **`commands`** and **`configurations`** and **`toolDependencies`**.
 
-An **`unfig` toolkit** is a javascript function that (optionally) takes configuration and provides `commands` and `configurations` and `toolDependencies`.
+The flow definition for a toolkit can be found [here](https://github.com/bradfordlemley/unfig/blob/33e549d111a8508cec176afd5c853b52df44fff8/packages/type-toolkit/index.js.flow#L66).
 
-**`unfig` toolkits** can use other **`unfig` toolkits** and can configure them, modify and cusomize their `commands` and `configurations`.
+### Included Toolkits
+Several toolkits are included in the `unfig` monorepo.
 
-The following example demonstrates all of these features.
+The monorepo contains toolkits for each tool, e.g. `babel`, `eslint`, `jest`. These are generally very simple toolkits. It is easy to recreate their functionality in higher-level toolkits, but it may be slightly easier to use them.
+
+Also, note that there's a monorepo `toolkit`. This toolkit can be installed at the top-level of a monorepo.
 
 ### Example
 
-In this example:
+This example shows two **toolkits**:
 
-`toolkit-1`
-
+**`toolkit-1`**
 - provides `cmd-1` and `config-1.js`
 
-`toolkit-2`
-
-- uses `toolkit-1` and optionally `toolkit-3` (not shown).
+**`toolkit-2`**
+- uses `toolkit-1` and `toolkit-3` (not shown).
 - modifies `config-1.js` (from `toolkit-1`).
 - provides `cmd-2` (which calls `cmd-1` from `toolkit-1`).
 - provides `config-2.js`.
@@ -107,7 +111,7 @@ module.exports = cfg => {
 };
 ```
 
-#### Using Example Toolkit
+#### Using Example
 A project could use `toolkit-2` by running `npx unfig init --toolkit toolkit-2`.
 
 The project would then contain `config-1.js` and `config-2.js`. See [configurations](#configurations) section for more info.
@@ -115,20 +119,6 @@ The project would then contain `config-1.js` and `config-2.js`. See [configurati
 The user could invoke `cmd-1` by running `npx unfig cmd-1`.
 
 The user could invoke `cmd-2` by running `npx unfig cmd-2`.
-
-## Toolkit Api
-
-The flow definition for the handler arguments can be found [here](github://bradfordlemley/unfig/type-toolkit).
-
-## Real Toolkits
-
-Several toolkits are included in the `unfig` monorepo.
-
-The monorepo contains separate toolkits for each `tool`, e.g. `babel`, `eslint`, `jest`. These are generally very simple toolkits. It is easy to recreate their functionality in higher-level toolkits, but it may be slightly easier to use them.
-
-Following the philosophy that toolkits should include **everything** necessary to maintain a **quality** project, note that several end-user `toolkits`, like react-comp, provide functionality such as auto-formatting of code on commit.
-
-Also, note that there's a monorepo `toolkit`. This toolkit can be installed at the top-level of a monorepo.
 
 ## `Configurations`
 
@@ -179,9 +169,19 @@ or
 
 `node -p "JSON.stringify(require('./.babelrc.js'), null, 2)"`
 
-# Existing Toolkits
+## `dependencies`
+`dependencies` specified by a toolkit end up installed as devDependencies in a project.
 
-### Analysis of Existing Toolkits
+They serve two purposes:
+
+1.  They allow toolkits or end users to change/modify tool versions without requiring a new version of a toolkit.
+2.  They allow modules to be resolved when referenced from the project.
+
+For example, this allows `babel` to work directly in the project, the same way it works when invoked from a toolkit.  `babel` version, and any plugins used by `.babelrc.js` configuration, can be modified by toolkits, or by the end user, and will be used whether `babel` is invoked directly from the project, or from a toolkit.
+
+Note: `unfig init` installs `dependencies` as `devDependencies`.  This modifies `devDependencies` in the project's package.json.
+
+# Current-generation Toolkits
 
 [create-react-app](https://github.com/facebook/create-react-app): AMAZING! And, yet, severely limiting. Your project will hit a brick wall if you need some functionality it doesn't provide. `Ejecting` leaves you unable to upgrade, `forking` is possible, but has significant complications, and `contributing` is a great option for some cases, but generally not available for customization.
 
