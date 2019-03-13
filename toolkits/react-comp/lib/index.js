@@ -10,10 +10,11 @@ export type ReactCompPluginCfg = {|
 
 */
 
-module.exports = (() => ({
+module.exports = ((cfg) => ({
   toolDependencies: true,
   toolkits: [
     require('@unfig/toolkit-stdprj')({
+      ...cfg,
       babelCfg: () => require('./configs/babel-config'),
       eslintCfg: () => require('./configs/eslint-cfg'),
       umdGlobals: {

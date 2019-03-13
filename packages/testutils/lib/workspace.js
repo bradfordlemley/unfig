@@ -86,15 +86,17 @@ function createWorkspace(workspaceRoot /* :string */) {
 async function withWorkspace(
   workspaceRoot /* :string */,
   setWs /*: (any) => any */,
+  opts /* :? {keep?: boolean} */
 ) /*  Promise<{ exec: any, execSync: any, cmd: any, dir: string }> */ {
   let ws;
 
+  const { keep } = opts || {};
   beforeAll(async () => {
     ws = createWorkspace(workspaceRoot);
     await setWs(ws);
   }, 30000);
   
-  afterAll(() => ws && ws.clean());
+  !keep && afterAll(() => ws && ws.clean());
 
 }
 
@@ -104,11 +106,12 @@ async function withInitWorkspace(
   toolkit /* :?string */,
   fixtureDir /* :?string */,
   initArgs /* : ?$ReadOnlyArray<string> */,
+  opts /* :? {keep?: boolean} */
 ) /*  Promise<{ exec: any, execSync: any, cmd: any, dir: string }> */ {
   withWorkspace(workspaceRoot, async (ws) => {
     await ws.init(toolkit, fixtureDir, initArgs);
     await setWs(ws);
-  })
+  }, opts)
 }
 
 module.exports = {

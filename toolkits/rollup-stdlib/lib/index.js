@@ -76,7 +76,7 @@ module.exports = (cfg => {
       }),
     ],
     commands: {
-      rollup: {
+      build: {
         describe: 'Package project',
         handler: async ({ env, self, args }) => {
           if (!env.pkg || !env.pkg.pkgJson) {
@@ -92,12 +92,17 @@ module.exports = (cfg => {
             path.join(__dirname, '../templates/cjs-template.js'),
             cjsFile,
             {
-              productionModule: files.cjs_prod,
-              developmentModule: files.cjs_dev,
+              productionModule: `./${path.relative(path.dirname(files.cjs), files.cjs_prod)}`,
+              developmentModule: `./${path.relative(path.dirname(files.cjs), files.cjs_dev)}`,
             }
           );
           return self.children.execCmd('rollup', ['-c'].concat(args));
         },
+      },
+      start: {
+        describe: 'Package project watchß',
+        handler: ({ args, self }) =>
+          self.execCmd('build', ['-w'].concat(args)),
       },
     },
     filepath: __filename,

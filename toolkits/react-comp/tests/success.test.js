@@ -9,7 +9,8 @@ withInitWorkspace(
   path.resolve(__dirname, '../__test-wkspcs__/success-'),
   path.resolve(__dirname, '../lib'),
   path.resolve(__dirname, '../fixtures/success'),
-  ["--no-install"]
+  ["--no-install"],
+  {keep: true},
 );
 
 test('toolkit includes dependencies', async () => {
@@ -54,11 +55,27 @@ test('Shows help', async () => {
   expect(out.stdout).toMatch(/\nOptions:/);
 });
 
+test.skip('Builds typedfs', async () => {
+  const { dir, spawn } = ws;
+  // const buildResult = await spawn(['build']);
+  // expect(buildResult.code).toBe(0);
+  // verifyFilelist(path.join(dir, 'expected-buildfiles.json'));
+
+  const tsBuildResult = await spawn(['buildTsDefs', '-d', "src/**/*"]);
+  console.log(`stdout: ${tsBuildResult.stdout}`)
+  console.log(`stderr: ${tsBuildResult.stderr}`)
+  expect(tsBuildResult.code).toBe(0);
+  verifyFilelist(path.join(dir, 'expected-buildfiles.json'));
+});
+
 test('Builds, tests, and lints', async () => {
   const { dir, spawn } = ws;
   const buildResult = await spawn(['build']);
   expect(buildResult.code).toBe(0);
   verifyFilelist(path.join(dir, 'expected-buildfiles.json'));
+
+  const tsBuildResult = await spawn(['buildTsDefs']);
+  expect(tsBuildResult.code).toBe(0);
 
   const testResult = await spawn([
     'test',

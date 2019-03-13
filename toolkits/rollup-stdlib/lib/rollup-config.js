@@ -139,11 +139,16 @@ const buildCjs = ({ env, input, file, extensions }) => {
   };
 };
 
+function forceRel(path) {
+  return path.startsWith('.') ? path : `./${path}`;
+}
+
 module.exports = (cfg /*: RollupCfgInput */) => {
-  const { pkgJson, input, umdGlobals, extensions: exts, files } = cfg || {};
+  const { pkgJson, input: origInput, umdGlobals, extensions: exts, files } = cfg || {};
   if (!pkgJson) {
     throw new Error(`PkgJson is required for rollup config`);
   }
+  const input = forceRel(origInput);
   const extensions =
     exts && exts.map(ext => (ext.startsWith('.') ? ext : `.${ext}`));
   return [

@@ -77,6 +77,12 @@ function getCfg(userCfg /* :?StdPrjUserCfg */) /* :StdPrjCfg */ {
   cfg.ignoreDirs = (cfg.ignoreDirs || []).concat(['flow-typed']);
 
   cfg.entry = cfg.entry || findEntry(cfg.srcDir, cfg.jsSrcExts) || '';
+  // if (!cfg.entry) {
+  //   throw new Error(`No entry file in cfg: ${JSON.stringify(cfg, null, 2)}`);
+  // }
+  // if (!fs.existsSync(cfg.entry)) {
+  //   throw new Error(`Entry file: ${cfg.entry} does not exist`);
+  // }
 
   return cfg;
 }

@@ -44,6 +44,7 @@ module.exports = (cfg => ({
           require('@unfig/toolkit-jest')({
             jestCfg: ({ requestFile }) => makeJestCfg(stdCfg, requestFile),
           }),
+        require('@unfig/toolkit-typescript')(),
         require('@unfig/toolkit-flow')(),
         require('@unfig/toolkit-prettier')({
           prettierCfg: () => require('./prettier-cfg'),
@@ -59,16 +60,22 @@ module.exports = (cfg => ({
         }),
       ],
       commands: {
-        build: {
-          describe: 'Build your project',
+        // build: {
+        //   describe: 'Build your project',
+        //   handler: ({ args, self }) => {
+        //     return self.children.execCmd('rollup', args);
+        //   },
+        // },
+        // start: {
+        //   describe: 'Build your project',
+        //   handler: ({ args, self }) =>
+        //     self.execCmd('build', ['-w'].concat(args)),
+        // },
+        buildTsDefs: {
+          describe: 'build type defs',
           handler: ({ args, self }) => {
-            return self.children.execCmd('rollup', ['-c'].concat(args));
+            return self.children.execCmd('tsc', ['-d', '--emitDeclarationOnly'].concat(args))
           },
-        },
-        start: {
-          describe: 'Build your project',
-          handler: ({ args, self }) =>
-            self.children.execCmd('rollup', ['-c', '-w'].concat(args)),
         },
         lint: {
           describe: 'Lint your project',

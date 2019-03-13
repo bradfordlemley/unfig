@@ -11,6 +11,7 @@ export type TypescriptPluginCfg = {|
 */
 
 module.exports = (() => ({
+  toolDependencies: true,
   commands: {
     tsc: {
       describe: "tsc build",

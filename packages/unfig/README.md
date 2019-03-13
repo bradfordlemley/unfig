@@ -4,15 +4,16 @@
 
 * **`unfig`** naturally supports **modularity**, **extendability**, **customizability**, and **configurability**.
 
-* **`unfig`** makes no presumptions about what functionality toolkits provide.
+* **`unfig`** makes **no presumptions** about the functionality that toolkits provide.
 
 The **`unfig`** philosophy is that toolkits should enable developers to quickly set up projects and support **_everything_** needed to develop and maintain **_quality_** projects, much more functionality than is typically included in [current-generation toolkits](#Current-generation_Toolkits).
 
 * The challenge is that, despite many similarties, every project can be different and developers don't want to be locked in to a toolkit.
+* `unfig` addresses this challenge by building **modularity**, **extendability**, **customizability**, and **configurability** into the framework.
 
 The **`unfig`** theory is that a **framework** that naturally supports these features can enable a proliferation of **_quality_** **_full-featured_** **toolkits**.
 * Projects can adopt toolkits without concern of lock-in because escape hatches are built in.
-* Toolkits can evolve quickly to enable projects of the future because new toolkits can be easily be built from pulling in functionality from existing toolkits.
+* Toolkits can evolve quickly to enable projects of the future because new toolkits can easily be built, pulling in functionality from existing toolkits.
 
 ## Overview
  
@@ -23,13 +24,17 @@ The **`unfig`** framework is simple.  All functionality comes from **`toolkits`*
 * **`configurations`**, which are tool configurations, like `.babelrc.js`.
 * **`dependencies`**, which are tools used by the toolkit, like `babel`.
 
-The **`unfig`** framework enables toolkits to utilize other toolkits -- to configure them and inherit their functionality, and/or customize their **`commands`**, **`configurations`**, and **`dependencies`**.
+The **`unfig`** framework enables toolkits to utilize other toolkits -- to configure them, inherit their functionality, and/or customize their **`commands`**, **`configurations`**, and **`dependencies`**.
 
-The **`unfig`** framework essentially hoists **`configurations`**, and **`dependencies`** into the project level.  This means a project directly contains standard configuration files which integrate seemlessly with tools in the ecosystem and also ultimately relinquishes control to the project itself.
+A key part of the **`unfig`** framework is that **`configurations` exist as _standard configuration files on disk_ in projects**.
+
+This allows the `configurations` to integrate seemlessly with tools in the ecosystem.  Generally, standard tools don't need to be integrated into `unfig`, they "just work".
+
+See more details about [configurations](#configurations) and [dependencies](#dependencies) below.
 
 ## Usage
 
-End users can use a **toolkit** in their project invoking one of the commands below.
+End users can utilzie a **toolkit** in their project by invoking one of the commands below.
 
 **`npx unfig create [dir] [--toolkit=<toolkit>]`**
 Create a new project using the specified toolkit. (User will be queried for dir and toolkit if not provided.)
@@ -37,24 +42,38 @@ Create a new project using the specified toolkit. (User will be queried for dir 
 **`npx unfig init [--toolkit=<toolkit>]`**
 Use specified toolkit in an existing project. (User will be queried for toolkit if not provided.)
 
-Other **`commands`**, which are provided by the **toolkit**, are shown in **`unfig help`**.
+**`commands`** provided by the **toolkit** are shown in **`unfig help`**.
 
 ## Toolkits
 
 An **`unfig` toolkit** is a javascript function that takes a configuration object and returns an object with **`commands`** and **`configurations`** and **`toolDependencies`**.
 
-The flow definition for a toolkit can be found [here](https://github.com/bradfordlemley/unfig/blob/33e549d111a8508cec176afd5c853b52df44fff8/packages/type-toolkit/index.js.flow#L66).
+```js
+// shape of an unfig toolkit module
+module.exports = config => ({
+  commands: {},
+  configurations: {},
+  toolDependencies: {},
+})
+```
 
-### Included Toolkits
-Several toolkits are included in the `unfig` monorepo.
+### Toolkit Type Definition
+The complete flow type definition for a toolkit can be found [here](https://github.com/bradfordlemley/unfig/blob/33e549d111a8508cec176afd5c853b52df44fff8/packages/type-toolkit/index.js.flow#L66).
 
-The monorepo contains toolkits for each tool, e.g. `babel`, `eslint`, `jest`. These are generally very simple toolkits. It is easy to recreate their functionality in higher-level toolkits, but it may be slightly easier to use them.
+### Real Toolkit Examples
+Several real toolkits are included in the `unfig` monorepo.
 
-Also, note that there's a monorepo `toolkit`. This toolkit can be installed at the top-level of a monorepo.
+The monorepo contains a simple toolkits for each tool, e.g. `babel`, `eslint`, `jest`. These are generally very simple toolkits providing a single `command` and a single `configuration`.
 
-### Example
+`react-comp` is a `toolkit` which supports a react component.
 
-This example shows two **toolkits**:
+`bare-node` is a `toolkit` which supports node scripts and is used by toolkits themselves.
+
+`monorepo` is a `toolkit` which can be installed at the top-level of a monorepo.
+
+### Demonstration Example
+
+This contrived example shows two **toolkits**:
 
 **`toolkit-1`**
 - provides `cmd-1` and `config-1.js`
@@ -169,7 +188,7 @@ or
 
 `node -p "JSON.stringify(require('./.babelrc.js'), null, 2)"`
 
-## `dependencies`
+## `Dependencies`
 `dependencies` specified by a toolkit end up installed as devDependencies in a project.
 
 They serve two purposes:
