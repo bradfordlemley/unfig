@@ -36,7 +36,7 @@ function isPath(pkg) {
   return path.isAbsolute(pkg) || pkg.startsWith('.');
 }
 
-async function createConfigFile(
+async function createConfigModule(
   targetFile,
   opts,
   templateFileOverride,
@@ -97,6 +97,55 @@ async function createConfigFile(
   }
 }
 
+async function createJsonFile(targetFile, json, opts) {
+  let create = true;
+  if (fs.existsSync(targetFile)) {
+    const existing = fs.readJsonSync(targetFile);
+    if (JSON.stringify(json) !== JSON.stringify(existing)) {
+      if (opts.force) {
+        console.error(
+          chalk.red(
+            `Overwriting target file ${targetFile} (due to --force option).`
+          )
+        );
+      } else {
+        console.warn(
+          chalk.yellow(`Target file ${targetFile} is different than template.`)
+        );
+        if (!opts.prompt) {
+          create = false;
+        } else {
+          create = await inquirer
+            .prompt({
+              type: 'confirm',
+              message: `Overwrite ${targetFile}?`,
+              name: 'overwrite',
+              default: false,
+            })
+            .then(answers => answers.overwrite);
+          create = Boolean(create);
+          if (create) {
+            console.log(
+              chalk.red(
+                `Overwriting target file ${targetFile} (due to user choice).`
+              )
+            );
+          }
+        }
+      }
+    } else {
+      console.log(chalk.green(`Target file ${targetFile} matches.`));
+      create = false;
+    }
+  } else {
+    console.log(chalk.blue(`Creating file ${targetFile} in target package.`));
+  }
+
+  if (create) {
+    fs.writeJsonSync(targetFile, json);
+  }
+}
+
 const init = (async function init({ env, argv, args }) {
   const targetDir = env.rootDir;
   if (!fs.existsSync(path.join(targetDir, 'package.json'))) {
@@ -128,25 +177,45 @@ const init = (async function init({ env, argv, args }) {
       await env.run('yarn', ['add', '--dev', toolkit]);
     }
     writeConfig(targetFile, {
-      toolkit: removeVersion(toolkit).replace(/\\/g, '\\\\')
+      toolkit: removeVersion(toolkit).replace(/\\/g, '\\\\'),
     });
   }
 
   const unfig = loadToolkit(targetDir);
 
   if (unfig && unfig.modules) {
+    let promise = Promise.resolve();
     Object.keys(unfig.modules).forEach(file => {
       if (unfig.modules && unfig.modules[file]) {
-        createConfigFile(path.join(targetDir, file), argv);
+        promise = promise.then(() =>
+          createConfigModule(path.join(targetDir, file), argv)
+        );
       }
     });
+    await promise;
+  }
+
+  if (unfig && unfig.jsonFiles) {
+    let promise = Promise.resolve();
+    Object.keys(unfig.jsonFiles).forEach(file => {
+      if (unfig.jsonFiles && unfig.jsonFiles[file]) {
+        promise = promise.then(() =>
+          createJsonFile(
+            path.join(targetDir, file),
+            unfig.jsonFiles[file].handler(),
+            argv
+          )
+        );
+      }
+    });
+    await promise;
   }
 
   if (!noInstall && unfig && unfig.toolDependencies) {
     const deps = [];
     Object.keys(unfig.toolDependencies).forEach(dep => {
       const version = unfig.toolDependencies[dep].version;
-      deps.push(`${dep}${version ? `@${version}` : ""}`)
+      deps.push(`${dep}${version ? `@${version}` : ''}`);
     });
     if (deps.length) {
       await env.run('yarn', ['add', '--dev'].concat(deps));

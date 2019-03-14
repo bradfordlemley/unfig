@@ -11,6 +11,7 @@ type LintStagedCfg = {|
 |};
 
 */
+
 module.exports = (stdCfg /*: $ReadOnly<StdPrjCfg> */) /*: LintStagedCfg */ => {
   const { ignoreDirs } = stdCfg;
   const prettierMatches = `**/*.{${stdCfg.jsSrcExts

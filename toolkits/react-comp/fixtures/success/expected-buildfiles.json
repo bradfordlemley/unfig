@@ -1,5 +1,8 @@
 {
   "dist": [
+    "component.d.ts",
+    "counter.d.ts",
+    "index.d.ts",
     "mylib.development.js",
     "mylib.development.js.map",
     "mylib.esm.js",

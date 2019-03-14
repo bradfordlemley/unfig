@@ -69,8 +69,13 @@ module.exports = (cfg => {
           if (!env.pkg || !env.pkg.pkgJson) {
             throw new Error(`No pkgJson`);
           }
+          if (!cfg.input) {
+            throw new Error(`No input in cfg: ${JSON.stringify(cfg, null, 2)}`);
+          }
           return require('./rollup-config')(
-            Object.assign({}, cfg, { files: getFiles(env.pkg.pkgJson, env.pkg.pkgFile) })
+            Object.assign({}, cfg, {
+              files: getFiles(env.pkg.pkgJson, env.pkg.pkgFile),
+            })
           );
         },
       }),
@@ -82,6 +87,9 @@ module.exports = (cfg => {
           if (!env.pkg || !env.pkg.pkgJson) {
             throw new Error(`No pkgJson`);
           }
+          if (!cfg.input) {
+            throw new Error(`No input in cfg: ${JSON.stringify(cfg, null, 2)}`);
+          }
           const files = getFiles(env.pkg.pkgJson, env.pkg.pkgFile);
           if (!env.pkg) {
             throw new Error(`Package does not have main entry`);
@@ -92,8 +100,14 @@ module.exports = (cfg => {
             path.join(__dirname, '../templates/cjs-template.js'),
             cjsFile,
             {
-              productionModule: `./${path.relative(path.dirname(files.cjs), files.cjs_prod)}`,
-              developmentModule: `./${path.relative(path.dirname(files.cjs), files.cjs_dev)}`,
+              productionModule: `./${path.relative(
+                path.dirname(files.cjs),
+                files.cjs_prod
+              )}`,
+              developmentModule: `./${path.relative(
+                path.dirname(files.cjs),
+                files.cjs_dev
+              )}`,
             }
           );
           return self.children.execCmd('rollup', ['-c'].concat(args));
@@ -101,8 +115,7 @@ module.exports = (cfg => {
       },
       start: {
         describe: 'Package project watchß',
-        handler: ({ args, self }) =>
-          self.execCmd('build', ['-w'].concat(args)),
+        handler: ({ args, self }) => self.execCmd('build', ['-w'].concat(args)),
       },
     },
     filepath: __filename,

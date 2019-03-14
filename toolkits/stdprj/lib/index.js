@@ -4,6 +4,7 @@ const stdcfg = require('@unfig/stdprj-config');
 const makeJestCfg = require('./jest-config');
 
 /*::
+
 import type {CreatePlugin} from '@unfig/type-toolkit';
 import type {EslintPluginCfg} from '@unfig/toolkit-eslint';
 import type {StdPrjUserCfg} from '@unfig/stdprj-config';
@@ -16,13 +17,14 @@ export type StdPrjPluginCfg = {|
   noTest?: boolean,
   umdGlobals?: { [string]: string },
 |}
+
 */
 
 module.exports = (cfg => ({
   load: env => {
     const { babelCfg, eslintCfg, noTest, umdGlobals, ...rest } = cfg || {};
     // $ExpectError: inexact type not compatible with exact
-    const stdCfg = stdcfg.getCfg(rest);
+    const stdCfg = stdcfg.getCfg(rest, env.pkg.pkgDir);
     const { ignoreDirs } = stdCfg;
 
     return {
@@ -44,7 +46,11 @@ module.exports = (cfg => ({
           require('@unfig/toolkit-jest')({
             jestCfg: ({ requestFile }) => makeJestCfg(stdCfg, requestFile),
           }),
-        require('@unfig/toolkit-typescript')(),
+        require('@unfig/toolkit-typescript')({
+          include: [`${stdCfg.srcDir}/**/*`],
+          exclude: stdCfg.srcDirTestFilePatterns.concat(['**/node_modules/**']),
+          outDir: stdCfg.publishDir,
+        }),
         require('@unfig/toolkit-flow')(),
         require('@unfig/toolkit-prettier')({
           prettierCfg: () => require('./prettier-cfg'),
@@ -60,21 +66,11 @@ module.exports = (cfg => ({
         }),
       ],
       commands: {
-        // build: {
-        //   describe: 'Build your project',
-        //   handler: ({ args, self }) => {
-        //     return self.children.execCmd('rollup', args);
-        //   },
-        // },
-        // start: {
-        //   describe: 'Build your project',
-        //   handler: ({ args, self }) =>
-        //     self.execCmd('build', ['-w'].concat(args)),
-        // },
-        buildTsDefs: {
-          describe: 'build type defs',
-          handler: ({ args, self }) => {
-            return self.children.execCmd('tsc', ['-d', '--emitDeclarationOnly'].concat(args))
+        build: {
+          describe: 'Build your project',
+          handler: async ({ args, self }) => {
+            await self.children.execCmd('build', args);
+            return self.children.execCmd('tscDefs');
           },
         },
         lint: {

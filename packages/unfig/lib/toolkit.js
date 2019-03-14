@@ -8,13 +8,16 @@ const getEnv = require('./env');
 /*::
 
 import {type PkgJson} from '@unfig/type-pkg-json';
-import type { Plugin, LoadedPlugin, GetModuleHandler, Command, EnvType } from '@unfig/type-toolkit';
+import type { Plugin, LoadedPlugin, GetModuleHandler, GetJsonHandler, Command, EnvType } from '@unfig/type-toolkit';
 
 type NormalizedPluginType = {|
   toolDependencies: { [string] : string},
   toolkits: Array<Plugin>,
   modules: {
     [string]: GetModuleHandler<>,
+  },
+  jsonFiles: {
+    [string]: GetJsonHandler,
   },
   commands: {
     [string]: Command,
@@ -53,15 +56,28 @@ function makePlugin(
   }
   function seedDependencies(dependencies) {
     const out = {};
-    dependencies && Object.keys(dependencies).forEach(key => {
-      out[key] = {
-        version: dependencies[key],
-        toolkit: base.filepath,
-      };
-    });
+    dependencies &&
+      Object.keys(dependencies).forEach(key => {
+        out[key] = {
+          version: dependencies[key],
+          toolkit: base.filepath,
+        };
+      });
+    return out;
+  }
+  function seedJsonFiles(jsonFiles) {
+    const out = {};
+    jsonFiles &&
+      Object.keys(jsonFiles).forEach(key => {
+        out[key] = {
+          handler: jsonFiles[key],
+          toolkit: base.filepath,
+        };
+      });
     return out;
   }
   const toolkit = {
+    jsonFiles: seedJsonFiles(base.jsonFiles),
     toolDependencies: seedDependencies(base.toolDependencies),
     filepath: base.filepath,
     modules: seedModules(base.modules),
@@ -73,7 +89,7 @@ function makePlugin(
         if (!child) {
           throw new Error(`Command ${cmd} not available in toolkits`);
         }
-        return child.commands[cmd].exec(args);
+        return child.commands[cmd].exec(args || []);
       },
       getModule: requestFile => {
         const baseFile = path.basename(requestFile);
@@ -92,7 +108,7 @@ function makePlugin(
           `Command ${cmd} is not supported by toolkit: ${toolkit.filepath}`
         );
       }
-      return toolkit.commands[cmd].exec(args);
+      return toolkit.commands[cmd].exec(args || []);
     },
     getModule: requestFile => {
       const baseFile = path.basename(requestFile);
@@ -137,7 +153,9 @@ function makePlugin(
   toolkits.forEach(p => {
     p.commands && mergeObj(toolkit.commands, p.commands);
     p.modules && mergeObj(toolkit.modules, p.modules);
-    p.toolDependencies && mergeObj(toolkit.toolDependencies, p.toolDependencies);
+    p.toolDependencies &&
+      mergeObj(toolkit.toolDependencies, p.toolDependencies);
+    p.jsonFiles && mergeObj(toolkit.jsonFiles, p.jsonFiles);
   });
 
   return toolkit;
@@ -190,7 +208,10 @@ const unfigDepRegex = /@?unfig/;
 
 function filterDeps(deps) {
   const d = {};
-  deps && Object.keys(deps).filter(dep => !dep.match(unfigDepRegex)).forEach(dep => d[dep] = deps[dep]);
+  deps &&
+    Object.keys(deps)
+      .filter(dep => !dep.match(unfigDepRegex))
+      .forEach(dep => (d[dep] = deps[dep]));
   return d;
 }
 
@@ -198,13 +219,13 @@ function getToolDeps(toolDeps, pkg) /*: { [string]: string }*/ {
   if (typeof toolDeps === 'boolean') {
     return toolDeps
       ? filterDeps(pkg && pkg.pkgJson && pkg.pkgJson.devDependencies)
-      : {}
+      : {};
   }
   if (typeof toolDeps === 'function') {
-    return toolDeps(pkg)
+    return toolDeps(pkg);
   }
   if (typeof toolDeps === 'object') {
-    return (toolDeps /*: {[string]: string} */ );
+    return (toolDeps /*: {[string]: string} */);
   }
   return {};
 }
@@ -221,16 +242,17 @@ function preloadPlugin(
     modules: stripObj(toolkit.modules),
     commands: stripObj(toolkit.commands),
     toolkits,
+    jsonFiles: stripObj(toolkit.jsonFiles),
   };
 
   if (toolkit.load) {
     const loadedParts = toolkit.load(env);
-    const { modules, commands, toolDependencies } = loadedParts;
+    const { modules, commands, jsonFiles, toolDependencies } = loadedParts;
 
     mergeObj(preloaded.modules, modules);
     mergeObj(preloaded.commands, commands);
     mergeObj(preloaded.toolDependencies, getToolDeps(toolDependencies, pkg));
-
+    mergeObj(preloaded.jsonFiles, stripObj(jsonFiles));
     if (loadedParts.toolkits) {
       preloaded.toolkits = preloaded.toolkits.concat(
         stripArr(loadedParts.toolkits)
@@ -308,14 +330,12 @@ function loadToolkitFromEnv(env /*: $ReadOnly<EnvType> */) {
   return loadPlugin(mod, env, []);
 }
 
-function loadToolkit(start /*: string */, gArgs /*: ?$ReadOnlyArray<string> */) {
+function loadToolkit(
+  start /*: string */,
+  gArgs /*: ?$ReadOnlyArray<string> */
+) {
   const env /*: $ReadOnly<EnvType> */ = getEnv(start, gArgs);
   return loadToolkitFromEnv(env);
-  // return (env.cfg && env.cfg.cfgFile) ? loadInitialToolkit(env.cfg.cfgFile, env) : undefined;
-  // return {
-  //   unfig: env.cfg && loadInitialToolkit(env.cfg.cfgFile, env),
-  //   env,
-  // };
 }
 
 // function enumUnfig(

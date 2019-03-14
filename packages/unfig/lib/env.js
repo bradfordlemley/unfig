@@ -19,8 +19,11 @@ module.exports = (
 ) /*: EnvType */ => {
   const cfgFilename = '.unfig.js';
   const gArgs = globalArgs || [];
-  const cfgFile = findFileUp(cfgFilename, rootDir);
   const pkg = findPkg(rootDir);
+  let cfgFile = findFileUp(cfgFilename, rootDir);
+  if (cfgFile && pkg && !cfgFile.startsWith(path.dirname(pkg.pkgDir))) {
+    cfgFile = null;
+  }
   const monoRepo = findMonorepo(rootDir);
   const cfg =
     cfgFile != null ? { cfgFile, cfgDir: path.dirname(cfgFile) } : undefined;

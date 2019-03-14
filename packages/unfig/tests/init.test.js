@@ -12,7 +12,9 @@ const simplePlugin = path.resolve(
 
 let ws = null;
 beforeEach(() => {
-  ws = createWorkspace(path.resolve(__dirname, '../__test-wkspcs__/unfig/init-'))
+  ws = createWorkspace(
+    path.resolve(__dirname, '../__test-wkspcs__/unfig/init-')
+  );
 });
 afterEach(() => {
   ws && ws.clean();
@@ -42,7 +44,7 @@ test('init asks for toolkit input', async () => {
   let workspaceDir = ws.dir;
   fs.writeJsonSync(path.join(workspaceDir, 'package.json'), {
     name: path.basename(workspaceDir),
-    version: "0.0.1",
+    version: '0.0.1',
   });
   const proc = execa(unfigBin, ['init', '--no-install'], { cwd: workspaceDir });
   proc.stdout.setEncoding('utf-8');
@@ -56,6 +58,7 @@ test('init asks for toolkit input', async () => {
     '.unfig.js',
     'config2.js',
     'config3.js',
+    'config6.json',
     'package.json',
   ]);
 });

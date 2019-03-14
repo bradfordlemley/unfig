@@ -47,7 +47,7 @@ module.exports = (
     }
 
     if (cmd == '') {
-      throw new Error(`No command found in ${args.join(' ')}`);
+      throw new Error(`No command found in args: ${args.join(' ')}`);
     }
 
     const wrapCmd = (name, command) => ({

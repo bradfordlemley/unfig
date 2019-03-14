@@ -1,44 +1,50 @@
 // @flow
 const path = require('path');
 // eslint-disable-next-line node/no-unpublished-require
-const { verifyCoverage, verifyEslintResults, verifyFilelist, verifyJestResults, withInitWorkspace } = require('@unfig/testutils');
+const {
+  verifyCoverage,
+  verifyEslintResults,
+  verifyFilelist,
+  verifyJestResults,
+  withInitWorkspace,
+} = require('@unfig/testutils');
 
 let ws;
 withInitWorkspace(
-  w => ws = w,
+  w => (ws = w),
   path.resolve(__dirname, '../__test-wkspcs__/success-'),
   path.resolve(__dirname, '../lib'),
   path.resolve(__dirname, '../fixtures/success'),
-  ["--no-install"],
-  {keep: true},
+  ['--no-install']
 );
 
-test('toolkit includes dependencies', async () => {
+test('Includes dependencies', async () => {
   const { dir } = ws;
   // eslint-disable-next-line node/no-unpublished-require
   const toolkit = require('unfig').loadToolkit(dir);
   if (!toolkit) {
-    throw new Error(`Could not get toolkit`)
+    throw new Error(`Could not get toolkit`);
   }
   expect(Object.keys(toolkit.toolDependencies)).toEqual([
-    "@babel/cli",
-    "@babel/core",
-    "@babel/plugin-proposal-class-properties",
-    "@babel/plugin-proposal-object-rest-spread",
-    "@babel/preset-env",
-    "@babel/preset-flow",
-    "@babel/preset-react",
-    "@babel/preset-typescript",
-    "babel-core",
-    "babel-eslint",
-    "babel-jest",
-    "eslint",
-    "eslint-plugin-flowtype",
-    "eslint-plugin-jsx-a11y",
-    "eslint-plugin-react",
-    "jest",
-    "rollup",
-  ])
+    '@babel/cli',
+    '@babel/core',
+    '@babel/plugin-proposal-class-properties',
+    '@babel/plugin-proposal-object-rest-spread',
+    '@babel/preset-env',
+    '@babel/preset-flow',
+    '@babel/preset-react',
+    '@babel/preset-typescript',
+    'babel-core',
+    'babel-eslint',
+    'babel-jest',
+    'eslint',
+    'eslint-plugin-flowtype',
+    'eslint-plugin-jsx-a11y',
+    'eslint-plugin-react',
+    'jest',
+    'rollup',
+    'typescript',
+  ]);
 });
 
 test('Shows help', async () => {
@@ -55,28 +61,19 @@ test('Shows help', async () => {
   expect(out.stdout).toMatch(/\nOptions:/);
 });
 
-test.skip('Builds typedfs', async () => {
+test('Builds', async () => {
   const { dir, spawn } = ws;
-  // const buildResult = await spawn(['build']);
-  // expect(buildResult.code).toBe(0);
-  // verifyFilelist(path.join(dir, 'expected-buildfiles.json'));
-
-  const tsBuildResult = await spawn(['buildTsDefs', '-d', "src/**/*"]);
-  console.log(`stdout: ${tsBuildResult.stdout}`)
-  console.log(`stderr: ${tsBuildResult.stderr}`)
-  expect(tsBuildResult.code).toBe(0);
+  const buildResult = await spawn(['build']);
+  if (buildResult.code) {
+    console.log(`stdout: ${buildResult.stdout}`);
+    console.log(`stderr: ${buildResult.stderr}`);
+  }
+  expect(buildResult.code).toBe(0);
   verifyFilelist(path.join(dir, 'expected-buildfiles.json'));
 });
 
-test('Builds, tests, and lints', async () => {
+test('Tests', async () => {
   const { dir, spawn } = ws;
-  const buildResult = await spawn(['build']);
-  expect(buildResult.code).toBe(0);
-  verifyFilelist(path.join(dir, 'expected-buildfiles.json'));
-
-  const tsBuildResult = await spawn(['buildTsDefs']);
-  expect(tsBuildResult.code).toBe(0);
-
   const testResult = await spawn([
     'test',
     '--json',
@@ -93,7 +90,10 @@ test('Builds, tests, and lints', async () => {
     path.join(dir, 'coverage/coverage-final.json'),
     path.join(dir, 'expected-coverage.json')
   );
+});
 
+test('Lints', async () => {
+  const { dir, spawn } = ws;
   const lintResult = await spawn([
     'lint',
     '--output-file',

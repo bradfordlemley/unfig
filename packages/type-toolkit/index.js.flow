@@ -63,10 +63,15 @@ type GenericGetModuleResult = any;
 
 export type GetModuleHandler<T=GenericGetModuleResult> = ($ReadOnly<GetModuleHandlerArgs>) => T;
 
+export type GetJsonHandler = () => {};
+
 export type PluginBase = {|
   toolkits?: Array<(?Plugin | CreatePlugin<> | false)>,
   modules?: {
     [string]: ?GetModuleHandler<> | false,
+  },
+  jsonFiles?: {
+    [string]: ?GetJsonHandler | false,
   },
   commands?: {
     [string]: ?Command | false,
@@ -99,6 +104,11 @@ export type LoadedDependency = {
   toolkit: Array<string>,
 }
 
+export type LoadedJsonCfg = {
+  handler: () => {},
+  toolkit: Array<string>,
+}
+
 export type LoadedPlugin = {|
   modules: {
     [string]: LoadedGetModule,
@@ -109,11 +119,14 @@ export type LoadedPlugin = {|
   toolDependencies: {
     [string]: LoadedDependency,
   },
-  execCmd: (cmd: string, args: ?$ReadOnlyArray<string>) => Promise<CommandResult>,
+  jsonFiles: {
+    [string]: LoadedJsonCfg,
+  },
+  execCmd: (cmd: string, args?: $ReadOnlyArray<string>) => Promise<CommandResult>,
   getModule: (requestFile: string) => GenericGetModuleResult,
   toolkits: Array<LoadedPlugin>,
   children: {
-    execCmd: (cmd: string, args: ?$ReadOnlyArray<string>) => Promise<CommandResult>,
+    execCmd: (cmd: string, args?: $ReadOnlyArray<string>) => Promise<CommandResult>,
     getModule: (requestFile: string) => GenericGetModuleResult,   
   },
   filepath: string,
