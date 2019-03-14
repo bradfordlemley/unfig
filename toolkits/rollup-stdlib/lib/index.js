@@ -114,7 +114,7 @@ module.exports = (cfg => {
         },
       },
       start: {
-        describe: 'Package project watchß',
+        describe: 'Package project watch',
         handler: ({ args, self }) => self.execCmd('build', ['-w'].concat(args)),
       },
     },

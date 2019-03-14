@@ -7,6 +7,8 @@ const { verifyResults: verifyCoverage } = require('./verifyCoverage');
 
 module.exports = {
   createWorkspace,
+  // $ExpectError: untyped module
+  readStreamUntil: require('./readstream-until'),
   verifyCoverage,
   verifyDir,
   verifyEslintResults,

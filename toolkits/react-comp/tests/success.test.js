@@ -2,6 +2,7 @@
 const path = require('path');
 // eslint-disable-next-line node/no-unpublished-require
 const {
+  readStreamUntil,
   verifyCoverage,
   verifyEslintResults,
   verifyFilelist,
@@ -59,6 +60,18 @@ test('Shows help', async () => {
   expect(out.stdout).toMatch(/\n\s+\S+\s+jest\s+/);
   expect(out.stdout).toMatch(/\nGlobal Options:/);
   expect(out.stdout).toMatch(/\nOptions:/);
+});
+
+test('Starts', async () => {
+  const { dir, spawn } = ws;
+  const proc = spawn(['start']);
+  const tscRegex = /Found 0 errors. Watching for file changes/;
+  const errOutput = await readStreamUntil(proc.stdout, tscRegex, 25000);
+  expect(errOutput).toMatch(tscRegex);
+  const regex = /\n.+created.+dist\/mylib\.esm\.js/;
+  const output = await readStreamUntil(proc.stderr, regex, 5000);
+  expect(output).toMatch(regex);
+  verifyFilelist(path.join(dir, 'expected-buildfiles.json'));
 });
 
 test('Builds', async () => {

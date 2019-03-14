@@ -73,6 +73,19 @@ module.exports = (cfg => ({
             return self.children.execCmd('tscDefs');
           },
         },
+        start: {
+          describe: 'Build your project',
+          handler: async ({ args, self }) => {
+            return Promise.all([
+              self.children.execCmd('start', args),
+              self.children.execCmd('tscDefs', [
+                '-w',
+                '--preserveWatchOutput',
+                '--listEmittedFiles',
+              ]),
+            ]).then(() => ({ code: 0 }));
+          },
+        },
         lint: {
           describe: 'Lint your project',
           handler: ({ args, self }) => self.children.execCmd('eslint', args),
