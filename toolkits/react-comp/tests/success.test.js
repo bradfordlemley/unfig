@@ -68,7 +68,7 @@ test('Starts', async () => {
   const proc = spawn(['start']);
   const tscRegex = /Found 0 errors. Watching for file changes/;
   const errOutput = await readStreamUntil(proc.stdout, tscRegex, 25000);
-  const regex = /dist\/mylib.esm.js/;
+  const regex = /dist[/\\]mylib.esm.js/;
   const output = await readStreamUntil(proc.stderr, regex, 5000);
   proc.kill('SIGKILL');
   console.log('killed: ', proc.killed);
