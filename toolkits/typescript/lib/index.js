@@ -9,12 +9,13 @@ export type TypescriptPluginCfg = {|
   +include?: $ReadOnlyArray<string>,
   jsx?: string,
   outDir: string,
+  target?: string,
 |}
 
 */
 
 module.exports = (cfg => {
-  const { exclude, jsx, include, outDir } = cfg || {};
+  const { exclude, jsx, include, outDir, target } = cfg || {};
   return {
     toolDependencies: true,
     jsonFiles: {
@@ -23,8 +24,10 @@ module.exports = (cfg => {
         exclude,
         compilerOptions: {
           outDir,
-          jsx: jsx || "react"
-        }
+          jsx: jsx || "react",
+          moduleResolution: "node",
+          target: target || "ES2017",
+        },
       })
     },
     commands: {
