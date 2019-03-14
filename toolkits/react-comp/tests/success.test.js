@@ -70,7 +70,8 @@ test('Starts', async () => {
   const errOutput = await readStreamUntil(proc.stdout, tscRegex, 25000);
   const regex = /dist\/mylib.esm.js/;
   const output = await readStreamUntil(proc.stderr, regex, 5000);
-  proc.kill();
+  proc.kill('SIGKILL');
+  console.log('killed: ', proc.killed);
   expect(errOutput).toMatch(tscRegex);
   expect(output).toMatch(regex);
   verifyFilelist(path.join(dir, 'expected-buildfiles.json'));
