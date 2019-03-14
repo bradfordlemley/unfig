@@ -68,9 +68,10 @@ test('Starts', async () => {
   const proc = spawn(['start']);
   const tscRegex = /Found 0 errors. Watching for file changes/;
   const errOutput = await readStreamUntil(proc.stdout, tscRegex, 25000);
-  expect(errOutput).toMatch(tscRegex);
-  const regex = /\n.+created.+dist\/mylib\.esm\.js/;
+  const regex = /dist\/mylib.esm.js/;
   const output = await readStreamUntil(proc.stderr, regex, 5000);
+  proc.kill();
+  expect(errOutput).toMatch(tscRegex);
   expect(output).toMatch(regex);
   verifyFilelist(path.join(dir, 'expected-buildfiles.json'));
 });
