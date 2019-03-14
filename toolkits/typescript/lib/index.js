@@ -7,17 +7,25 @@ import type {CreatePlugin} from '@unfig/type-toolkit';
 export type TypescriptPluginCfg = {|
   +exclude?: $ReadOnlyArray<string>,
   +include?: $ReadOnlyArray<string>,
+  jsx?: string,
   outDir: string,
 |}
 
 */
 
 module.exports = (cfg => {
-  const { include, exclude, outDir } = cfg || {};
+  const { exclude, jsx, include, outDir } = cfg || {};
   return {
     toolDependencies: true,
     jsonFiles: {
-      "tsconfig.json": () => ({ include, exclude, compilerOptions: { outDir } })
+      "tsconfig.json": () => ({
+        include,
+        exclude,
+        compilerOptions: {
+          outDir,
+          jsx: jsx || "react"
+        }
+      })
     },
     commands: {
       tsc: {
@@ -29,8 +37,14 @@ module.exports = (cfg => {
         handler: ({ args, self }) => {
           return self.execCmd(
             "tsc",
-            ["-d", "--emitDeclarationOnly", "--jsx", "react"].concat(args)
+            ["-d", "--emitDeclarationOnly"].concat(args)
           );
+        }
+      },
+      tscCheck: {
+        describe: "run typescript checker",
+        handler: ({ args, self }) => {
+          return self.execCmd("tsc", ["--noEmit"].concat(args));
         }
       }
     },

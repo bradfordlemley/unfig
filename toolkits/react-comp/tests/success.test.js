@@ -16,7 +16,8 @@ withInitWorkspace(
   path.resolve(__dirname, '../__test-wkspcs__/success-'),
   path.resolve(__dirname, '../lib'),
   path.resolve(__dirname, '../fixtures/success'),
-  ['--no-install']
+  ['--no-install'],
+  { keep: true }
 );
 
 test('Includes dependencies', async () => {
@@ -83,6 +84,16 @@ test('Builds', async () => {
   }
   expect(buildResult.code).toBe(0);
   verifyFilelist(path.join(dir, 'expected-buildfiles.json'));
+});
+
+test('Typescript checks', async () => {
+  const { spawn } = ws;
+  const result = await spawn(['tscCheck']);
+  if (result.code) {
+    console.log(`stdout: ${result.stdout}`);
+    console.log(`stderr: ${result.stderr}`);
+  }
+  expect(result.code).toBe(0);
 });
 
 test('Tests', async () => {
