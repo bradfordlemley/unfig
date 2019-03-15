@@ -65,6 +65,8 @@ export type GetModuleHandler<T=GenericGetModuleResult> = ($ReadOnly<GetModuleHan
 
 export type GetJsonHandler = () => {};
 
+export type ToolDepFunction = (pkg: ?$ReadOnly<PkgData>, def: { [string]: string }) => { [string]: string };
+
 export type PluginBase = {|
   toolkits?: Array<(?Plugin | CreatePlugin<> | false)>,
   modules?: {
@@ -76,9 +78,7 @@ export type PluginBase = {|
   commands?: {
     [string]: ?Command | false,
   },
-  toolDependencies?: boolean | {
-    [string]: string,
-  }
+  toolDependencies?: boolean | { [string]: string } | ToolDepFunction,
 |};
 
 export type Plugin = {|

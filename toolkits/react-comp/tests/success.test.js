@@ -1,4 +1,5 @@
 // @flow
+const treeKill = require('tree-kill');
 const path = require('path');
 // eslint-disable-next-line node/no-unpublished-require
 const {
@@ -19,6 +20,10 @@ withInitWorkspace(
   ['--no-install'],
   { keep: true }
 );
+
+function kill(pid, sig) {
+  return new Promise(resolve => treeKill(pid, sig, resolve));
+}
 
 test('Includes dependencies', async () => {
   const { dir } = ws;
@@ -70,7 +75,7 @@ test('Starts', async () => {
   const errOutput = await readStreamUntil(proc.stdout, tscRegex, 25000);
   const regex = /dist[/\\]mylib.esm.js/;
   const output = await readStreamUntil(proc.stderr, regex, 5000);
-  proc.kill('SIGKILL');
+  await kill(proc.pid);
   console.log('killed: ', proc.killed);
   expect(errOutput).toMatch(tscRegex);
   expect(output).toMatch(regex);

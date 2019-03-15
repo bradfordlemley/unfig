@@ -10,8 +10,14 @@ export type ReactCompPluginCfg = {|
 
 */
 
-module.exports = ((cfg) => ({
-  toolDependencies: true,
+const IGNORE = ['tree-kill'];
+
+module.exports = (cfg => ({
+  toolDependencies: (pkg, deps) => {
+    const newDeps = { ...deps };
+    IGNORE.forEach(dep => delete newDeps[dep]);
+    return newDeps;
+  },
   toolkits: [
     require('@unfig/toolkit-stdprj')({
       ...cfg,

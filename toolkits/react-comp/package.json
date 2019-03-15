@@ -30,6 +30,7 @@
     "eslint-plugin-react": "7.11.1",
     "jest": "^24.1.0",
     "rollup": "^1.4.0",
+    "tree-kill": "^1.2.1",
     "unfig": "^0.0.2-alpha.0"
   },
   "engines": {

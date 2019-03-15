@@ -222,7 +222,10 @@ function getToolDeps(toolDeps, pkg) /*: { [string]: string }*/ {
       : {};
   }
   if (typeof toolDeps === 'function') {
-    return toolDeps(pkg);
+    return toolDeps(
+      pkg,
+      filterDeps(pkg && pkg.pkgJson && pkg.pkgJson.devDependencies)
+    );
   }
   if (typeof toolDeps === 'object') {
     return (toolDeps /*: {[string]: string} */);
