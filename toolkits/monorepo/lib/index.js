@@ -125,11 +125,16 @@ module.exports = (cfg => ({
         },
         run: {
           describe: 'Run command on all packages in monorepo',
-          handler: ({ args }) => runCommand(args[0]),
+          handler: ({ args }) => runCommand(args[0], args.slice(1)),
         },
-        runC: {
+        runP: {
           describe: 'Run command on all packages in monorepo',
-          handler: ({ args }) => runCommand(args[0]),
+          handler: ({ args }) =>
+            runCommand(args[0], args.slice(1), ['--parallel']),
+        },
+        start: {
+          describe: 'Run command on all packages in monorepo',
+          handler: ({ args }) => runCommand('start', args, ['--parallel']),
         },
         test: {
           describe: 'Run tests on all packages in monorepo',

@@ -1,25 +1,19 @@
-// @flow strict
-// $ExpectError: untyped import
+// @flow
 const process = require('process');
-// $ExpectError: untyped import
 const commonjs = require('rollup-plugin-commonjs');
-// $ExpectError: untyped import
 const replace = require('rollup-plugin-replace');
-// $ExpectError: untyped import
 const resolve = require('rollup-plugin-node-resolve');
-// $ExpectError: untyped import
 const sourceMaps = require('rollup-plugin-sourcemaps');
-// $ExpectError: untyped import
 const babel = require('rollup-plugin-babel');
-// $ExpectError: untyped import
 const { terser } = require('rollup-plugin-terser');
-// $ExpectError: untyped import
 const { sizeSnapshot } = require('rollup-plugin-size-snapshot');
 
 /*::
 
 import type {PkgJson} from '@unfig/type-pkg-json';
 import type {RollupCfgPluginCfg} from '.';
+
+import type {RollupOptions as RollupCfg} from 'rollup';
 
 type RollupCfgInput = {|
   extensions?: $ReadOnlyArray<string>, 
@@ -48,7 +42,7 @@ const buildUmd = ({
   umdGlobals: globals,
   pkgJson,
   extensions,
-}) => {
+}) /*: RollupCfg */ => {
   return {
     input,
     external: globals && Object.keys(globals),
@@ -101,7 +95,7 @@ const buildUmd = ({
   };
 };
 
-const buildCjs = ({ env, input, file, extensions }) => {
+const buildCjs = ({ env, input, file, extensions }) /*: RollupCfg */ => {
   return {
     input,
     external,
@@ -143,8 +137,9 @@ function forceRel(path) {
   return path.startsWith('.') ? path : `./${path}`;
 }
 
-module.exports = (cfg /*: RollupCfgInput */) => {
-  const { pkgJson, input: origInput, umdGlobals, extensions: exts, files } = cfg || {};
+module.exports = (cfg /*: RollupCfgInput */) /* :Array<RollupCfg> */ => {
+  const { pkgJson, input: origInput, umdGlobals, extensions: exts, files } =
+    cfg || {};
   if (!pkgJson) {
     throw new Error(`PkgJson is required for rollup config`);
   }
@@ -202,5 +197,11 @@ module.exports = (cfg /*: RollupCfgInput */) => {
         sourceMaps(),
       ],
     },
-  ];
+  ].map(rc =>
+    Object.assign({}, rc, {
+      watch: {
+        clearScreen: false,
+      },
+    })
+  );
 };

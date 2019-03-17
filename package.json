@@ -24,7 +24,7 @@
     "prettier-package-json": "^2.0.1"
   },
   "devDependencies": {
-    "flow-bin": "^0.91.0"
+    "flow-bin": "^0.95.1"
   },
   "author": "Bradford Lemley <bradfordlemley@gmail.com>"
 }

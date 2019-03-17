@@ -8,12 +8,12 @@
 [libs]
 
 [lints]
-all=warn
-sketchy-null-bool=off
-sketchy-null-string=off
+; all=warn
+; sketchy-null-bool=off
+; sketchy-null-string=off
 
 [options]
 suppress_comment=\\(.\\|\n\\)*\\$ExpectError
-include_warnings=true
+# include_warnings=true
 
 [strict]
