@@ -13,6 +13,9 @@ export type HuskyPluginCfg = {|
 module.exports = (cfg => {
   const { huskyCfg } = cfg || {};
   return {
+    toolDependencies: {
+      husky: "latest"
+    },
     modules: {
       ".huskyrc.js": huskyCfg ? () => huskyCfg() : require("./husky-cfg")()
     },

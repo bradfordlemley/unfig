@@ -25,6 +25,8 @@ module.exports = (
     cfgFile = null;
   }
   const monoRepo = findMonorepo(rootDir);
+  const isMonorepoPkg = monoRepo && pkg && pkg.pkgFile === monoRepo.pkg.pkgFile;
+
   const cfg =
     cfgFile != null ? { cfgFile, cfgDir: path.dirname(cfgFile) } : undefined;
   const env = {
@@ -56,6 +58,10 @@ module.exports = (
         stdout: result.stdout,
         stderr: result.stderr,
       }));
+    },
+    installDevDeps: async deps => {
+      const xArgs = isMonorepoPkg ? ['-W'] : [];
+      return env.run('yarn', ['add', '--dev'].concat(xArgs).concat(deps));
     },
   };
 

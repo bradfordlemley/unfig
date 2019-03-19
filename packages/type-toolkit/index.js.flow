@@ -36,6 +36,7 @@ export type EnvType = {|
   +cfgFilename: string,
   +gArgs: $ReadOnlyArray<string>,
   +run: Run,
+  +installDevDeps: (deps: $ReadOnlyArray<string>) => Promise<any>,
 |};
 
 export type CommandResult = {} | string;

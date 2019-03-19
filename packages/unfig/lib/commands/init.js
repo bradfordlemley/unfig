@@ -174,7 +174,7 @@ const init = (async function init({ env, argv, args }) {
       throw new Error(`Unexpected toolkit type`);
     }
     if (!isPath(toolkit)) {
-      await env.run('yarn', ['add', '--dev', toolkit]);
+      await env.installDevDeps([toolkit]);
     }
     writeConfig(targetFile, {
       toolkit: removeVersion(toolkit).replace(/\\/g, '\\\\'),
@@ -212,13 +212,12 @@ const init = (async function init({ env, argv, args }) {
   }
 
   if (!noInstall && unfig && unfig.toolDependencies) {
-    const deps = [];
-    Object.keys(unfig.toolDependencies).forEach(dep => {
+    const deps = Object.keys(unfig.toolDependencies).map(dep => {
       const version = unfig.toolDependencies[dep].version;
-      deps.push(`${dep}${version ? `@${version}` : ''}`);
+      return `${dep}${version ? `@${version}` : ''}`;
     });
     if (deps.length) {
-      await env.run('yarn', ['add', '--dev'].concat(deps));
+      await env.installDevDeps(deps);
     }
   }
 
