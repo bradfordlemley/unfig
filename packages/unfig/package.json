@@ -2,7 +2,7 @@
   "name": "unfig",
   "license": "MIT",
   "author": "Bradford Lemley <bradfordlemley@gmail.com>",
-  "version": "0.0.2-alpha.0",
+  "version": "0.0.3-alpha.0",
   "main": "lib/index.js",
   "bin": {
     "unfig": "./lib/cli.js"
@@ -11,9 +11,9 @@
     "unfig": "node ./lib/cli.js"
   },
   "dependencies": {
-    "@unfig/find-monorepo": "^0.0.2-alpha.0",
-    "@unfig/find-pkg": "^0.0.2-alpha.0",
-    "@unfig/find-up": "^0.0.2-alpha.0",
+    "@unfig/find-monorepo": "^0.0.3-alpha.0",
+    "@unfig/find-pkg": "^0.0.3-alpha.0",
+    "@unfig/find-up": "^0.0.3-alpha.0",
     "chalk": "^2.4.1",
     "execa": "1.0.0",
     "find-pkg": "^2.0.0",
@@ -28,9 +28,9 @@
     "yargs-parser": "^13.0.0"
   },
   "devDependencies": {
-    "@unfig/testutils": "^0.0.2-alpha.0",
-    "@unfig/toolkit-bare-node": "^0.0.2-alpha.0",
-    "@unfig/type-toolkit": "^0.0.2-alpha.0"
+    "@unfig/testutils": "^0.0.3-alpha.0",
+    "@unfig/toolkit-bare-node": "^0.0.3-alpha.0",
+    "@unfig/type-toolkit": "^0.0.3-alpha.0"
   },
   "engines": {
     "node": ">=8.3"
