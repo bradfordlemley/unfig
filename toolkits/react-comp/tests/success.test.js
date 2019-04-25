@@ -58,7 +58,7 @@ test('Shows help', async () => {
   const { spawn } = ws;
   const out = await spawn(['--help']);
   expect(out.code).toBe(0);
-  expect(out.stdout).toMatch(/^Usage:\s+\S+\s+<command>/);
+  expect(out.stdout).toMatch(/^Usage:.+<command>/);
   expect(out.stdout).toMatch(/\nCommands:/);
   expect(out.stdout).toMatch(/\n\s+\S+\s+init\s+/);
   expect(out.stdout).toMatch(/\n\s+\S+\s+build\s+/);

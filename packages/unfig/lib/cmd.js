@@ -78,7 +78,8 @@ module.exports = (
     };
 
     let yCmd = yargs()
-      .usage('Usage: unfig <command> [options]')
+      .usage('Usage: unfig [globalOpts] <command> [commandOpts]')
+      .scriptName('unfig')
       .option('rootDir', {
         describe: 'Where to start looking for project package, default: cwd',
         requiresArg: true,
@@ -93,12 +94,12 @@ module.exports = (
         type: 'boolean',
       })
       .option('inspect', {
-        describe: 'Spawn children with node --inspect',
+        describe: 'Spawn child processes with node --inspect',
         type: 'boolean',
       })
       .option('inspect-brk', {
         conflicts: 'inspect',
-        describe: 'Spawn children with node --inspect-brk',
+        describe: 'Spawn child processes with node --inspect-brk',
         type: 'boolean',
       })
       .group(['rootDir'], 'Global Options:')

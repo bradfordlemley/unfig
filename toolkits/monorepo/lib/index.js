@@ -68,19 +68,15 @@ module.exports = (cfg => ({
 
       const promises = [];
 
-      if (scriptPkgsToRun.length)
-        promises.push(
-          execa(
-            'lerna',
-            ['run']
-              .concat(lernaFlags || [])
-              .concat(makeScopeArgs(scriptPkgsToRun))
-              .concat([cmd, '--'].concat(args || [])),
-            {
-              stdio: 'inherit',
-            }
-          )
-        );
+      if (scriptPkgsToRun.length) {
+        const lernaArgs = ['run']
+          .concat(lernaFlags || [])
+          .concat(makeScopeArgs(scriptPkgsToRun))
+          .concat([cmd])
+          .concat(args ? ['--'].concat(args) : []);
+        // console.log(`lerna ${lernaArgs}`);
+        promises.push(execa('lerna', lernaArgs, { stdio: 'inherit' }));
+      }
 
       if (unifigPkgsToRun.length) {
         promises.push(
@@ -143,7 +139,7 @@ module.exports = (cfg => ({
           describe: 'Run command on all packages in monorepo',
           handler: ({ args }) => runCommand(args[0], args.slice(1)),
         },
-        runP: {
+        'run-p': {
           describe: 'Run command on all packages in monorepo in parallel',
           handler: ({ args }) =>
             runCommand(args[0], args.slice(1), ['--parallel']),
@@ -152,7 +148,7 @@ module.exports = (cfg => ({
           describe: 'Run command on all packages in monorepo',
           // handler: ({ args }) => runCommand('start', args, ['--parallel']),
           handler: ({ self, args }) =>
-            self.execCmd('runP', ['start'].concat(args)),
+            self.execCmd('run-p', ['start'].concat(args)),
         },
         test: {
           describe: 'Run tests on all packages in monorepo',

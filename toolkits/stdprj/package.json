@@ -12,6 +12,7 @@
     "@unfig/toolkit-jest": "^0.0.2-alpha.0",
     "@unfig/toolkit-lint-staged": "^0.0.2-alpha.0",
     "@unfig/toolkit-prettier": "^0.0.2-alpha.0",
+    "@unfig/toolkit-prettier-pkg-json": "^0.0.2-alpha.0",
     "@unfig/toolkit-rollup": "^0.0.2-alpha.0",
     "@unfig/toolkit-rollup-stdlib": "^0.0.2-alpha.0",
     "@unfig/toolkit-typescript": "^0.0.2-alpha.0",

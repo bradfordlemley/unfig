@@ -227,7 +227,7 @@ const init = (async function init({ env, argv, args }) {
 module.exports = {
   commands: {
     init: {
-      command: 'init [--force]',
+      // command: 'init [--force]',
       describe: 'Initialize project',
       builder:
         // $ExpectError: missing type annotation
@@ -253,7 +253,8 @@ module.exports = {
               hidden: true,
               type: 'string',
             })
-            .group(['type', 'force', 'no-prompt', 'help'], 'Command Options:')
+            // .group(['type', 'force', 'no-prompt', 'help'], 'Command Options:')
+            // .group('Command Options:')
             .version(false)
             .help(),
       handler: init,

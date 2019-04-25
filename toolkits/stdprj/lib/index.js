@@ -80,7 +80,7 @@ module.exports = (cfg => ({
               self.children.execCmd('start', args),
               self.children.execCmd('tscDefs', [
                 '-w',
-                '--preserveWatchOutput',
+                '--preserveWatchOutput', // don't clear screen
                 '--listEmittedFiles',
               ]),
             ]).then(() => ({ code: 0 }));

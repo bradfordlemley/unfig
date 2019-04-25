@@ -8,7 +8,7 @@ const execScript = args =>
   execa(path.resolve(__dirname, '../lib/cli.js'), args);
 
 function verifyHelpOutput(output) {
-  expect(output).toMatch(/^Usage:\s+\S+\s+<command>/);
+  expect(output).toMatch(/^Usage:.+<command>/);
   expect(output).toMatch(/\nCommands:/);
   expect(output).toMatch(/\nGlobal Options:/);
   expect(output).toMatch(/\nOptions:/);
@@ -56,7 +56,7 @@ test('Shows help for init --help', async () => {
   const out = await execScript(['init', '--help']);
   expect(out.code).toEqual(0);
   expect(out.stdout).toMatch(/init/);
-  expect(out.stdout).toMatch(/\n\s+--type/);
+  expect(out.stdout).toMatch(/\n\s+--toolkit/);
   expect(out.stdout).toMatch(/\n\s+--force/);
   expect(out.stdout).toMatch(/\n\s+--no-prompt/);
   expect(out.stdout).toMatch(/\n\s+--help/);
