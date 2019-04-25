@@ -30,5 +30,9 @@ module.exports = (() => ({
       },
     },
   }),
+  toolDependencies: {
+    babel: "6.23.0",
+    rimraf: "2.6.3",
+  },
   filepath: __filename,
 }) /*:CreatePlugin<{}> */);

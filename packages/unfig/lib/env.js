@@ -19,9 +19,14 @@ module.exports = (
 ) /*: EnvType */ => {
   const cfgFilename = '.unfig.js';
   const gArgs = globalArgs || [];
-  const cfgFile = findFileUp(cfgFilename, rootDir);
   const pkg = findPkg(rootDir);
+  let cfgFile = findFileUp(cfgFilename, rootDir);
+  if (cfgFile && pkg && !cfgFile.startsWith(path.dirname(pkg.pkgDir))) {
+    cfgFile = null;
+  }
   const monoRepo = findMonorepo(rootDir);
+  const isMonorepoPkg = monoRepo && pkg && pkg.pkgFile === monoRepo.pkg.pkgFile;
+
   const cfg =
     cfgFile != null ? { cfgFile, cfgDir: path.dirname(cfgFile) } : undefined;
   const env = {
@@ -43,15 +48,20 @@ module.exports = (
         cwd: rootDir,
         ...opts,
       };
-      // console.log(`Running ${jsBin} ${cArgs.join(" ")}`)
+      // console.log(`Running ${jsBin} ${cArgs.join(" ")}`);
+      // console.log(`resolved: ${resolvedJsBin}`)
       return (nodeArgs && nodeArgs.length
         ? execa('node', nodeArgs.concat([resolvedJsBin]).concat(cArgs), sOpts)
-        : execa(jsBin, cArgs, sOpts)
+        : execa(resolvedJsBin, cArgs, sOpts)
       ).then(result => ({
         code: result.code,
         stdout: result.stdout,
         stderr: result.stderr,
       }));
+    },
+    installDevDeps: async deps => {
+      const xArgs = isMonorepoPkg ? ['-W'] : [];
+      return env.run('yarn', ['add', '--dev'].concat(xArgs).concat(deps));
     },
   };
 

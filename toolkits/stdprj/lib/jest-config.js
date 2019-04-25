@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 /*::
+
 import type {StdPrjCfg} from '@unfig/stdprj-config';
 
 import type {JestConfigType} from '@unfig/toolkit-jest';

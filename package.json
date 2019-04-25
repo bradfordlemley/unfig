@@ -5,14 +5,15 @@
       "packages/*",
       "toolkits/*",
       "examples/*",
-      "__testpkgs__/**"
+      "__test-wkspcs__/**",
+      "__test-wkspcs__/*/**"
     ]
   },
   "scripts": {
     "flow": "npm run unfig reflow",
     "lint": "npm run unfig run eslint",
     "reset": "lerna clean -y && yarn",
-    "test": "npm run unfig test",
+    "test": "npm run unfig jest --detectOpenHandles",
     "unfig": "node packages/unfig/lib/cli.js",
     "validate": "npm run flow && npm run lint && npm run test"
   },
@@ -23,7 +24,7 @@
     "prettier-package-json": "^2.0.1"
   },
   "devDependencies": {
-    "flow-bin": "^0.91.0"
+    "flow-bin": "^0.95.1"
   },
   "author": "Bradford Lemley <bradfordlemley@gmail.com>"
 }

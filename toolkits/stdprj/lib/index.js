@@ -4,6 +4,7 @@ const stdcfg = require('@unfig/stdprj-config');
 const makeJestCfg = require('./jest-config');
 
 /*::
+
 import type {CreatePlugin} from '@unfig/type-toolkit';
 import type {EslintPluginCfg} from '@unfig/toolkit-eslint';
 import type {StdPrjUserCfg} from '@unfig/stdprj-config';
@@ -16,19 +17,20 @@ export type StdPrjPluginCfg = {|
   noTest?: boolean,
   umdGlobals?: { [string]: string },
 |}
+
 */
 
 module.exports = (cfg => ({
   load: env => {
     const { babelCfg, eslintCfg, noTest, umdGlobals, ...rest } = cfg || {};
     // $ExpectError: inexact type not compatible with exact
-    const stdCfg = stdcfg.getCfg(rest);
+    const stdCfg = stdcfg.getCfg(rest, env.pkg.pkgDir);
     const { ignoreDirs } = stdCfg;
 
     return {
       toolkits: [
         require('@unfig/toolkit-eslint')({
-          dirs: [stdCfg.srcDir],
+          dirs: [stdCfg.srcDir].concat(stdCfg.testDir || []),
           exts: stdCfg.jsSrcExts,
           ignoreDirs,
           eslintCfg: eslintCfg,
@@ -44,6 +46,11 @@ module.exports = (cfg => ({
           require('@unfig/toolkit-jest')({
             jestCfg: ({ requestFile }) => makeJestCfg(stdCfg, requestFile),
           }),
+        require('@unfig/toolkit-typescript')({
+          include: [`${stdCfg.srcDir}/**/*`],
+          exclude: stdCfg.srcDirTestFilePatterns.concat(['**/node_modules/**']),
+          outDir: stdCfg.publishDir,
+        }),
         require('@unfig/toolkit-flow')(),
         require('@unfig/toolkit-prettier')({
           prettierCfg: () => require('./prettier-cfg'),
@@ -61,14 +68,23 @@ module.exports = (cfg => ({
       commands: {
         build: {
           describe: 'Build your project',
-          handler: ({ args, self }) => {
-            return self.children.execCmd('rollup', ['-c'].concat(args));
+          handler: async ({ args, self }) => {
+            await self.children.execCmd('build', args);
+            return self.children.execCmd('tscDefs');
           },
         },
         start: {
           describe: 'Build your project',
-          handler: ({ args, self }) =>
-            self.children.execCmd('rollup', ['-c', '-w'].concat(args)),
+          handler: async ({ args, self }) => {
+            return Promise.all([
+              self.children.execCmd('start', args),
+              self.children.execCmd('tscDefs', [
+                '-w',
+                '--preserveWatchOutput', // don't clear screen
+                '--listEmittedFiles',
+              ]),
+            ]).then(() => ({ code: 0 }));
+          },
         },
         lint: {
           describe: 'Lint your project',

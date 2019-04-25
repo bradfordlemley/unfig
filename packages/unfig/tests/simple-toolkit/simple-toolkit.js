@@ -5,6 +5,9 @@ module.exports = () => ({
     'config4.js': undefined,
     'config5.js': false,
   },
+  jsonFiles: {
+    'config6.json': () => ({ config: 'config6' }),
+  },
   commands: {
     test: {
       handler: async () => 'this is a test',
@@ -39,5 +42,8 @@ module.exports = () => ({
       },
     },
   }),
+  toolDependencies: {
+    eslint: '5.10.0',
+  },
   filepath: __filename,
 });

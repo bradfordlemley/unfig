@@ -1,4 +1,5 @@
 // @flow
+const findPkg = require('@unfig/find-pkg');
 const fs = require('fs-extra');
 const path = require('path');
 const { genFromFile, templateDir } = require('./templates');
@@ -7,12 +8,16 @@ const getEnv = require('./env');
 /*::
 
 import {type PkgJson} from '@unfig/type-pkg-json';
-import type { Plugin, LoadedPlugin, GetModuleHandler, Command, EnvType } from '@unfig/type-toolkit';
+import type { Plugin, LoadedPlugin, GetModuleHandler, GetJsonHandler, Command, EnvType } from '@unfig/type-toolkit';
 
 type NormalizedPluginType = {|
+  toolDependencies: { [string] : string},
   toolkits: Array<Plugin>,
   modules: {
     [string]: GetModuleHandler<>,
+  },
+  jsonFiles: {
+    [string]: GetJsonHandler,
   },
   commands: {
     [string]: Command,
@@ -49,7 +54,31 @@ function makePlugin(
     });
     return out;
   }
+  function seedDependencies(dependencies) {
+    const out = {};
+    dependencies &&
+      Object.keys(dependencies).forEach(key => {
+        out[key] = {
+          version: dependencies[key],
+          toolkit: base.filepath,
+        };
+      });
+    return out;
+  }
+  function seedJsonFiles(jsonFiles) {
+    const out = {};
+    jsonFiles &&
+      Object.keys(jsonFiles).forEach(key => {
+        out[key] = {
+          handler: jsonFiles[key],
+          toolkit: base.filepath,
+        };
+      });
+    return out;
+  }
   const toolkit = {
+    jsonFiles: seedJsonFiles(base.jsonFiles),
+    toolDependencies: seedDependencies(base.toolDependencies),
     filepath: base.filepath,
     modules: seedModules(base.modules),
     commands: seedCommands(base.commands),
@@ -60,7 +89,7 @@ function makePlugin(
         if (!child) {
           throw new Error(`Command ${cmd} not available in toolkits`);
         }
-        return child.commands[cmd].exec(args);
+        return child.commands[cmd].exec(args || []);
       },
       getModule: requestFile => {
         const baseFile = path.basename(requestFile);
@@ -79,7 +108,7 @@ function makePlugin(
           `Command ${cmd} is not supported by toolkit: ${toolkit.filepath}`
         );
       }
-      return toolkit.commands[cmd].exec(args);
+      return toolkit.commands[cmd].exec(args || []);
     },
     getModule: requestFile => {
       const baseFile = path.basename(requestFile);
@@ -124,6 +153,9 @@ function makePlugin(
   toolkits.forEach(p => {
     p.commands && mergeObj(toolkit.commands, p.commands);
     p.modules && mergeObj(toolkit.modules, p.modules);
+    p.toolDependencies &&
+      mergeObj(toolkit.toolDependencies, p.toolDependencies);
+    p.jsonFiles && mergeObj(toolkit.jsonFiles, p.jsonFiles);
   });
 
   return toolkit;
@@ -172,25 +204,58 @@ function mergeObj /*:: <T> */(
     });
 }
 
+const unfigDepRegex = /@?unfig/;
+
+function filterDeps(deps) {
+  const d = {};
+  deps &&
+    Object.keys(deps)
+      .filter(dep => !dep.match(unfigDepRegex))
+      .forEach(dep => (d[dep] = deps[dep]));
+  return d;
+}
+
+function getToolDeps(toolDeps, pkg) /*: { [string]: string }*/ {
+  if (typeof toolDeps === 'boolean') {
+    return toolDeps
+      ? filterDeps(pkg && pkg.pkgJson && pkg.pkgJson.devDependencies)
+      : {};
+  }
+  if (typeof toolDeps === 'function') {
+    return toolDeps(
+      pkg,
+      filterDeps(pkg && pkg.pkgJson && pkg.pkgJson.devDependencies)
+    );
+  }
+  if (typeof toolDeps === 'object') {
+    return (toolDeps /*: {[string]: string} */);
+  }
+  return {};
+}
+
 function preloadPlugin(
   toolkit /* :$ReadOnly<Plugin> */,
   env
 ) /* :NormalizedPluginType */ {
   const toolkits = toolkit.toolkits ? stripArr(toolkit.toolkits) : [];
+  const pkg = findPkg(toolkit.filepath);
   const preloaded = {
+    toolDependencies: getToolDeps(toolkit.toolDependencies, pkg),
     filepath: toolkit.filepath,
     modules: stripObj(toolkit.modules),
     commands: stripObj(toolkit.commands),
     toolkits,
+    jsonFiles: stripObj(toolkit.jsonFiles),
   };
 
   if (toolkit.load) {
     const loadedParts = toolkit.load(env);
-    const { modules, commands } = loadedParts;
+    const { modules, commands, jsonFiles, toolDependencies } = loadedParts;
 
     mergeObj(preloaded.modules, modules);
     mergeObj(preloaded.commands, commands);
-
+    mergeObj(preloaded.toolDependencies, getToolDeps(toolDependencies, pkg));
+    mergeObj(preloaded.jsonFiles, stripObj(jsonFiles));
     if (loadedParts.toolkits) {
       preloaded.toolkits = preloaded.toolkits.concat(
         stripArr(loadedParts.toolkits)
@@ -254,22 +319,26 @@ function loadPlugin(
   return makePlugin(nPlugin, toolkits, env);
 }
 
-function loadUnfig(filepath /*: string */, env /*: $ReadOnly<EnvType> */) {
-  // $ExpectError: dynamic require
-  const mod = require(filepath);
-  if (typeof mod === 'function') {
-    throw new Error(`Unfig module should not be a function, in ${filepath}`);
+function loadToolkitFromEnv(env /*: $ReadOnly<EnvType> */) {
+  if (!env.cfg) {
+    return undefined;
   }
-  mod.filepath = filepath;
+  const { cfgFile } = env.cfg;
+  // $ExpectError: dynamic require
+  const mod = require(cfgFile);
+  if (typeof mod === 'function') {
+    throw new Error(`Unfig module should not be a function, in ${cfgFile}`);
+  }
+  mod.filepath = cfgFile;
   return loadPlugin(mod, env, []);
 }
 
-function getUnfig(start /*: string */, gArgs /*: ?$ReadOnlyArray<string> */) {
+function loadToolkit(
+  start /*: string */,
+  gArgs /*: ?$ReadOnlyArray<string> */
+) {
   const env /*: $ReadOnly<EnvType> */ = getEnv(start, gArgs);
-  return {
-    unfig: env.cfg && loadUnfig(env.cfg.cfgFile, env),
-    env,
-  };
+  return loadToolkitFromEnv(env);
 }
 
 // function enumUnfig(
@@ -278,7 +347,7 @@ function getUnfig(start /*: string */, gArgs /*: ?$ReadOnlyArray<string> */) {
 // ) {
 //   let currDir = env.rootDir;
 //   for (;;) {
-//     const cfgMod = getUnfig(env);
+//     const cfgMod = loadToolkit(env);
 //     if (!cfgMod) {
 //       break;
 //     }
@@ -303,6 +372,7 @@ function writeConfig(
 }
 
 module.exports = {
-  getUnfig,
+  loadToolkit,
+  loadToolkitFromEnv,
   writeConfig,
 };

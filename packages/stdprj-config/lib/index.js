@@ -46,13 +46,20 @@ const defaultCfg = {
   testDir: 'tests',
 };
 
-function findEntry(srcDir /*: string */, exts /*: $ReadOnlyArray<string> */) {
+function findEntry(
+  srcDir /*: string */,
+  exts /*: $ReadOnlyArray<string> */,
+  prjDir
+) {
   return combine(['index.'], exts)
     .map(f => path.join(srcDir, f))
-    .find(f => fs.existsSync(f));
+    .find(f => fs.existsSync(path.join(prjDir, f)));
 }
 
-function getCfg(userCfg /* :?StdPrjUserCfg */) /* :StdPrjCfg */ {
+function getCfg(
+  userCfg /* :?StdPrjUserCfg */,
+  prjDir /*: string */
+) /* :StdPrjCfg */ {
   const cfg = {
     ...defaultCfg,
     ...userCfg,
@@ -76,7 +83,7 @@ function getCfg(userCfg /* :?StdPrjUserCfg */) /* :StdPrjCfg */ {
 
   cfg.ignoreDirs = (cfg.ignoreDirs || []).concat(['flow-typed']);
 
-  cfg.entry = cfg.entry || findEntry(cfg.srcDir, cfg.jsSrcExts) || '';
+  cfg.entry = cfg.entry || findEntry(cfg.srcDir, cfg.jsSrcExts, prjDir) || '';
 
   return cfg;
 }

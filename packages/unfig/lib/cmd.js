@@ -4,7 +4,8 @@ const execa = require('execa');
 // $ExpectError: untyped module
 const yargs = require('yargs/yargs');
 const parseargs = require('./parseargs');
-const { getUnfig } = require('./toolkit');
+const getEnv = require('./env');
+const { loadToolkitFromEnv } = require('./toolkit');
 
 /*::
 import type {CommonModuleObject} from 'yargs';
@@ -27,7 +28,8 @@ module.exports = (
 
     const parseableArgs = [cmd].concat(cmdArgs.parseable);
 
-    const { env, unfig } = getUnfig(gArgv.rootDir || process.cwd(), gArgs);
+    const env = getEnv(gArgv.rootDir || process.cwd(), gArgs);
+    const toolkit = loadToolkitFromEnv(env);
 
     if (rebug) {
       resolve(
@@ -45,7 +47,7 @@ module.exports = (
     }
 
     if (cmd == '') {
-      throw new Error(`No command found in ${args.join(' ')}`);
+      throw new Error(`No command found in args: ${args.join(' ')}`);
     }
 
     const wrapCmd = (name, command) => ({
@@ -76,7 +78,8 @@ module.exports = (
     };
 
     let yCmd = yargs()
-      .usage('Usage: unfig <command> [options]')
+      .usage('Usage: unfig [globalOpts] <command> [commandOpts]')
+      .scriptName('unfig')
       .option('rootDir', {
         describe: 'Where to start looking for project package, default: cwd',
         requiresArg: true,
@@ -91,12 +94,12 @@ module.exports = (
         type: 'boolean',
       })
       .option('inspect', {
-        describe: 'Spawn children with node --inspect',
+        describe: 'Spawn child processes with node --inspect',
         type: 'boolean',
       })
       .option('inspect-brk', {
         conflicts: 'inspect',
-        describe: 'Spawn children with node --inspect-brk',
+        describe: 'Spawn child processes with node --inspect-brk',
         type: 'boolean',
       })
       .group(['rootDir'], 'Global Options:')
@@ -123,8 +126,8 @@ module.exports = (
 
     if (!INTERNAL_COMMANDS.includes(cmd)) {
       let commandFound = false;
-      if (unfig != null) {
-        const { commands } = unfig;
+      if (toolkit != null) {
+        const { commands } = toolkit;
         Object.keys(commands).forEach(key => {
           yCmd.command(wrapPluginCmd(key, commands[key]));
           if (key === cmd) {

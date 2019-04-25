@@ -10,6 +10,7 @@
   "devDependencies": {
     "@unfig/toolkit-bare-node": "^0.0.2-alpha.0",
     "@unfig/type-toolkit": "^0.0.2-alpha.0",
+    "typescript": "^3.3.3333",
     "unfig": "^0.0.2-alpha.0"
   },
   "engines": {

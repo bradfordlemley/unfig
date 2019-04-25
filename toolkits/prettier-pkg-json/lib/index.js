@@ -10,6 +10,9 @@ export type PrettierPkgJsonPluginCfg = {
 */
 
 module.exports = (() => ({
+  toolDependencies: {
+    'prettier-package-json': '',
+  },
   commands: {
     'prettier-pkg-json': {
       describe: 'Prettyify your package.json',

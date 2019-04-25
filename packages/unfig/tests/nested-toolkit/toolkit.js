@@ -40,5 +40,9 @@ module.exports = (() => ({
       },
     },
   }),
+  toolDependencies: {
+    eslint: "5.10.0",
+    babel: "6.0.0",
+  },
   filepath: __filename,
 }) /*:CreatePlugin<{}> */);

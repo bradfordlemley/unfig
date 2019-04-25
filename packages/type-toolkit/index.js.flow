@@ -36,6 +36,7 @@ export type EnvType = {|
   +cfgFilename: string,
   +gArgs: $ReadOnlyArray<string>,
   +run: Run,
+  +installDevDeps: (deps: $ReadOnlyArray<string>) => Promise<any>,
 |};
 
 export type CommandResult = {} | string;
@@ -63,14 +64,22 @@ type GenericGetModuleResult = any;
 
 export type GetModuleHandler<T=GenericGetModuleResult> = ($ReadOnly<GetModuleHandlerArgs>) => T;
 
+export type GetJsonHandler = () => {};
+
+export type ToolDepFunction = (pkg: ?$ReadOnly<PkgData>, def: { [string]: string }) => { [string]: string };
+
 export type PluginBase = {|
   toolkits?: Array<(?Plugin | CreatePlugin<> | false)>,
   modules?: {
     [string]: ?GetModuleHandler<> | false,
   },
+  jsonFiles?: {
+    [string]: ?GetJsonHandler | false,
+  },
   commands?: {
     [string]: ?Command | false,
   },
+  toolDependencies?: boolean | { [string]: string } | ToolDepFunction,
 |};
 
 export type Plugin = {|
@@ -91,6 +100,16 @@ export type LoadedGetModule = {
   get: (requestFile: string) => GenericGetModuleResult,
 };
 
+export type LoadedDependency = {
+  version: string,
+  toolkit: Array<string>,
+}
+
+export type LoadedJsonCfg = {
+  handler: () => {},
+  toolkit: Array<string>,
+}
+
 export type LoadedPlugin = {|
   modules: {
     [string]: LoadedGetModule,
@@ -98,11 +117,17 @@ export type LoadedPlugin = {|
   commands: {
     [string]: LoadedCmd,
   },
-  execCmd: (cmd: string, args: ?$ReadOnlyArray<string>) => Promise<CommandResult>,
+  toolDependencies: {
+    [string]: LoadedDependency,
+  },
+  jsonFiles: {
+    [string]: LoadedJsonCfg,
+  },
+  execCmd: (cmd: string, args?: $ReadOnlyArray<string>) => Promise<CommandResult>,
   getModule: (requestFile: string) => GenericGetModuleResult,
   toolkits: Array<LoadedPlugin>,
   children: {
-    execCmd: (cmd: string, args: ?$ReadOnlyArray<string>) => Promise<CommandResult>,
+    execCmd: (cmd: string, args?: $ReadOnlyArray<string>) => Promise<CommandResult>,
     getModule: (requestFile: string) => GenericGetModuleResult,   
   },
   filepath: string,

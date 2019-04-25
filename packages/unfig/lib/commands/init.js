@@ -4,7 +4,7 @@ const path = require('path');
 const chalk = require('chalk');
 const inquirer = require('inquirer');
 const { genFromFile, templateDir } = require('../templates');
-const { writeConfig, getUnfig } = require('../toolkit');
+const { writeConfig, loadToolkit } = require('../toolkit');
 
 /*::
 
@@ -36,7 +36,7 @@ function isPath(pkg) {
   return path.isAbsolute(pkg) || pkg.startsWith('.');
 }
 
-async function createConfigFile(
+async function createConfigModule(
   targetFile,
   opts,
   templateFileOverride,
@@ -97,14 +97,64 @@ async function createConfigFile(
   }
 }
 
-const init = (async function init({ env, argv }) {
+async function createJsonFile(targetFile, json, opts) {
+  let create = true;
+  if (fs.existsSync(targetFile)) {
+    const existing = fs.readJsonSync(targetFile);
+    if (JSON.stringify(json) !== JSON.stringify(existing)) {
+      if (opts.force) {
+        console.error(
+          chalk.red(
+            `Overwriting target file ${targetFile} (due to --force option).`
+          )
+        );
+      } else {
+        console.warn(
+          chalk.yellow(`Target file ${targetFile} is different than template.`)
+        );
+        if (!opts.prompt) {
+          create = false;
+        } else {
+          create = await inquirer
+            .prompt({
+              type: 'confirm',
+              message: `Overwrite ${targetFile}?`,
+              name: 'overwrite',
+              default: false,
+            })
+            .then(answers => answers.overwrite);
+          create = Boolean(create);
+          if (create) {
+            console.log(
+              chalk.red(
+                `Overwriting target file ${targetFile} (due to user choice).`
+              )
+            );
+          }
+        }
+      }
+    } else {
+      console.log(chalk.green(`Target file ${targetFile} matches.`));
+      create = false;
+    }
+  } else {
+    console.log(chalk.blue(`Creating file ${targetFile} in target package.`));
+  }
+
+  if (create) {
+    fs.writeJsonSync(targetFile, json);
+  }
+}
+
+const init = (async function init({ env, argv, args }) {
   const targetDir = env.rootDir;
   if (!fs.existsSync(path.join(targetDir, 'package.json'))) {
     throw new Error(`package.json missing in ${targetDir}`);
   }
   const targetFile = path.join(targetDir, env.cfgFilename);
-  console.log(chalk.green(`Initializing at ${targetDir}.`));
+  console.log(chalk.green(`Creating at ${targetDir}.`));
   let toolkit = undefined;
+  const noInstall = args.includes('--no-install');
   if (!fs.existsSync(targetFile)) {
     if (argv.toolkit) {
       toolkit = argv.toolkit;
@@ -124,29 +174,60 @@ const init = (async function init({ env, argv }) {
       throw new Error(`Unexpected toolkit type`);
     }
     if (!isPath(toolkit)) {
-      await env.run('yarn', ['add', toolkit, '--dev']);
+      await env.installDevDeps([toolkit]);
     }
     writeConfig(targetFile, {
       toolkit: removeVersion(toolkit).replace(/\\/g, '\\\\'),
     });
   }
 
-  const { unfig } = getUnfig(targetDir);
+  const unfig = loadToolkit(targetDir);
 
   if (unfig && unfig.modules) {
+    let promise = Promise.resolve();
     Object.keys(unfig.modules).forEach(file => {
       if (unfig.modules && unfig.modules[file]) {
-        createConfigFile(path.join(targetDir, file), argv);
+        promise = promise.then(() =>
+          createConfigModule(path.join(targetDir, file), argv)
+        );
       }
     });
+    await promise;
   }
+
+  if (unfig && unfig.jsonFiles) {
+    let promise = Promise.resolve();
+    Object.keys(unfig.jsonFiles).forEach(file => {
+      if (unfig.jsonFiles && unfig.jsonFiles[file]) {
+        promise = promise.then(() =>
+          createJsonFile(
+            path.join(targetDir, file),
+            unfig.jsonFiles[file].handler(),
+            argv
+          )
+        );
+      }
+    });
+    await promise;
+  }
+
+  if (!noInstall && unfig && unfig.toolDependencies) {
+    const deps = Object.keys(unfig.toolDependencies).map(dep => {
+      const version = unfig.toolDependencies[dep].version;
+      return `${dep}${version ? `@${version}` : ''}`;
+    });
+    if (deps.length) {
+      await env.installDevDeps(deps);
+    }
+  }
+
   return { code: 0 };
 } /*: InternalCmd<InitFlags> */);
 
 module.exports = {
   commands: {
     init: {
-      command: 'init [--force]',
+      // command: 'init [--force]',
       describe: 'Initialize project',
       builder:
         // $ExpectError: missing type annotation
@@ -172,7 +253,8 @@ module.exports = {
               hidden: true,
               type: 'string',
             })
-            .group(['type', 'force', 'no-prompt', 'help'], 'Command Options:')
+            // .group(['type', 'force', 'no-prompt', 'help'], 'Command Options:')
+            // .group('Command Options:')
             .version(false)
             .help(),
       handler: init,

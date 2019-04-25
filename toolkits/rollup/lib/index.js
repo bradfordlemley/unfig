@@ -4,10 +4,7 @@
 
 import type {CreatePlugin, GetModuleHandler} from '@unfig/type-toolkit';
 
-type RollupCfg = {
-  external?: Array<string> | string => boolean,
-  globals?: {[string]:string},
-};
+import type {RollupOptions as RollupCfg} from 'rollup';
 
 export type RollupPluginCfg = {|
   rollupCfg?: GetModuleHandler<Array<RollupCfg> | RollupCfg>,

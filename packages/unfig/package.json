@@ -8,9 +8,7 @@
     "unfig": "./lib/cli.js"
   },
   "scripts": {
-    "publish": "npx lerna exec --no-bail -- npm publish --access public",
-    "unfig": "node ./lib/cli.js",
-    "version": "npx lerna version --no-push"
+    "unfig": "node ./lib/cli.js"
   },
   "dependencies": {
     "@unfig/find-monorepo": "^0.0.2-alpha.0",

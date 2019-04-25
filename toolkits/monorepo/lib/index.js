@@ -26,6 +26,18 @@ function usesUnifig({ pkgJson, pkgFile }, env) {
   return Boolean(unifigDevDep || unifigScript || fs.existsSync(unifigFile));
 }
 
+const hasScript = ({ pkgJson }, script) =>
+  pkgJson.scripts && pkgJson.scripts[script];
+
+function makeScopeArgs(pkgs) {
+  const a = [];
+  pkgs.forEach(pkg => {
+    a.push('--scope');
+    a.push(pkg.pkgJson.name);
+  });
+  return a;
+}
+
 module.exports = (cfg => ({
   load: env => {
     const { pkg, monoRepo } = env;
@@ -36,14 +48,12 @@ module.exports = (cfg => ({
 
     const { ignoreMissingPkgCmd } = cfg || {};
     async function runCommand(cmd, args, lernaFlags) {
-      const hasScript = ({ pkgJson }) =>
-        pkgJson.scripts && pkgJson.scripts[cmd];
-
       const unifigPkgsToRun = monoRepo.pkgs.filter(
-        pkg => !hasScript(pkg) && usesUnifig(pkg, env)
+        pkg => !hasScript(pkg, cmd) && usesUnifig(pkg, env)
       );
+      const scriptPkgsToRun = monoRepo.pkgs.filter(pkg => hasScript(pkg, cmd));
       const pkgsWithout = monoRepo.pkgs.filter(
-        pkg => !hasScript(pkg) && !usesUnifig(pkg, env)
+        pkg => !hasScript(pkg, cmd) && !usesUnifig(pkg, env)
       );
       const pkgErrs = pkgsWithout.filter(
         pkg => ignoreMissingPkgCmd == null || !ignoreMissingPkgCmd(pkg, cmd)
@@ -56,24 +66,34 @@ module.exports = (cfg => ({
         );
       }
 
-      const unifigScopeArgs = [];
-      unifigPkgsToRun.forEach(pkg => {
-        unifigScopeArgs.push('--scope');
-        unifigScopeArgs.push(pkg.pkgJson.name);
-      });
-      await execa('lerna', ['run', cmd], {
-        stdio: 'inherit',
-      });
-      await execa(
-        'lerna',
-        ['exec']
+      const promises = [];
+
+      if (scriptPkgsToRun.length) {
+        const lernaArgs = ['run']
           .concat(lernaFlags || [])
-          .concat(unifigScopeArgs)
-          .concat(['--', 'unfig', cmd].concat(args || [])),
-        {
-          stdio: 'inherit',
-        }
-      );
+          .concat(makeScopeArgs(scriptPkgsToRun))
+          .concat([cmd])
+          .concat(args ? ['--'].concat(args) : []);
+        // console.log(`lerna ${lernaArgs}`);
+        promises.push(execa('lerna', lernaArgs, { stdio: 'inherit' }));
+      }
+
+      if (unifigPkgsToRun.length) {
+        promises.push(
+          execa(
+            'lerna',
+            ['exec']
+              .concat(lernaFlags || [])
+              .concat(makeScopeArgs(unifigPkgsToRun))
+              .concat(['--', 'unfig', cmd].concat(args || [])),
+            {
+              stdio: 'inherit',
+            }
+          )
+        );
+      }
+
+      await Promise.all(promises);
       return {
         code: 0,
       };
@@ -100,14 +120,6 @@ module.exports = (cfg => ({
             // running in parralell can cause multiple git adds to occur in
             // parallel which will cause git failures.
             runCommand('pre-commit', args, ['--concurrency', '1']),
-          // handler: () => {
-          //   console.error("Running pre-commit");
-          //   return execa(
-          //     "lerna",
-          //     ["run", "--concurrency", "1", "--stream", "pre-commit"],
-          //     { stdio: "inherit" }
-          //   );
-          // }
         },
         validate: {
           describe: 'Run validation on all packages in monorepo',
@@ -116,9 +128,27 @@ module.exports = (cfg => ({
             return runCommand('validate');
           },
         },
+        reset: {
+          describe: 'Run command on all packages in monorepo',
+          handler: async ({ env }) => {
+            await env.run('lerna', ['clean', '-y']);
+            return env.run('yarn');
+          },
+        },
         run: {
           describe: 'Run command on all packages in monorepo',
-          handler: ({ args }) => runCommand(args[0]),
+          handler: ({ args }) => runCommand(args[0], args.slice(1)),
+        },
+        'run-p': {
+          describe: 'Run command on all packages in monorepo in parallel',
+          handler: ({ args }) =>
+            runCommand(args[0], args.slice(1), ['--parallel']),
+        },
+        start: {
+          describe: 'Run command on all packages in monorepo',
+          // handler: ({ args }) => runCommand('start', args, ['--parallel']),
+          handler: ({ self, args }) =>
+            self.execCmd('run-p', ['start'].concat(args)),
         },
         test: {
           describe: 'Run tests on all packages in monorepo',

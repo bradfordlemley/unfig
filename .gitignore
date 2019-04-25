@@ -7,5 +7,4 @@
 coverage/
 **/__temp__/**
 **/package-lock.json
-__testpkgs__
-test-workspaces
+__test-wkspcs__

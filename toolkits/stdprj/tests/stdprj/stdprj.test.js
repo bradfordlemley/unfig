@@ -1,5 +1,5 @@
 const path = require('path');
-
+// eslint-disable-next-line node/no-unpublished-require
 const unfig = require('unfig');
 
 test('gets cfg files from toolkit', () => {
