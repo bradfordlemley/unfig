@@ -152,7 +152,7 @@ module.exports = (cfg => ({
         },
         test: {
           describe: 'Run tests on all packages in monorepo',
-          handler: () => runCommand('test'),
+          handler: ({ args }) => runCommand('test', args),
         },
       },
     };
