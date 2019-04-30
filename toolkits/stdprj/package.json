@@ -2,7 +2,7 @@
   "name": "@unfig/toolkit-stdprj",
   "license": "MIT",
   "author": "Bradford Lemley <bradfordlemley@gmail.com>",
-  "version": "0.0.3-alpha.0",
+  "version": "0.0.4-alpha.0",
   "main": "lib/index.js",
   "dependencies": {
     "@unfig/stdprj-config": "^0.0.3-alpha.0",
@@ -14,13 +14,13 @@
     "@unfig/toolkit-prettier": "^0.0.3-alpha.0",
     "@unfig/toolkit-prettier-pkg-json": "^0.0.3-alpha.0",
     "@unfig/toolkit-rollup": "^0.0.3-alpha.0",
-    "@unfig/toolkit-rollup-stdlib": "^0.0.3-alpha.0",
+    "@unfig/toolkit-rollup-stdlib": "^0.0.4-alpha.0",
     "@unfig/toolkit-typescript": "^0.0.3-alpha.0",
     "@unfig/type-toolkit": "^0.0.3-alpha.0",
     "babel-jest": "^24.7.1"
   },
   "devDependencies": {
-    "@unfig/toolkit-bare-node": "^0.0.3-alpha.0",
+    "@unfig/toolkit-bare-node": "^0.0.4-alpha.0",
     "unfig": "^0.0.3-alpha.0"
   },
   "engines": {
