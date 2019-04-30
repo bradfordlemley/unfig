@@ -69,6 +69,7 @@ module.exports = (cfg => ({
         build: {
           describe: 'Build your project',
           handler: async ({ args, self }) => {
+            process.env.NODE_ENV = 'production';
             await self.children.execCmd('build', args);
             return self.children.execCmd('tscDefs');
           },
@@ -76,6 +77,7 @@ module.exports = (cfg => ({
         start: {
           describe: 'Build your project',
           handler: async ({ args, self }) => {
+            process.env.NODE_ENV = 'development';
             return Promise.all([
               self.children.execCmd('start', args),
               self.children.execCmd('tscDefs', [
@@ -92,7 +94,10 @@ module.exports = (cfg => ({
         },
         test: {
           describe: 'Test your project',
-          handler: ({ args, self }) => self.children.execCmd('jest', args),
+          handler: ({ args, self }) => {
+            process.env.NODE_ENV = 'test';
+            return self.children.execCmd('jest', args);
+          },
         },
         'test:debug': {
           describe: 'Test your project',

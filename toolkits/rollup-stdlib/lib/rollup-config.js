@@ -62,6 +62,7 @@ const buildUmd = ({
       babel({
         exclude: '**/node_modules/**',
         extensions,
+        runtimeHelpers: true,
       }),
       commonjs({
         include: /node_modules/,
@@ -112,6 +113,7 @@ const buildCjs = ({ env, input, file, extensions }) /*: RollupCfg */ => {
       babel({
         exclude: '**/node_modules/**',
         extensions,
+        runtimeHelpers: true,
       }),
       sourceMaps(),
       sizeSnapshot(),
@@ -192,6 +194,7 @@ module.exports = (cfg /*: RollupCfgInput */) /* :Array<RollupCfg> */ => {
         babel({
           exclude: '**/node_modules/**',
           extensions: cfg.extensions,
+          runtimeHelpers: true,
         }),
         process.platform !== 'win32' && sizeSnapshot(),
         sourceMaps(),

@@ -16,7 +16,8 @@
     "@unfig/toolkit-rollup": "^0.0.3-alpha.0",
     "@unfig/toolkit-rollup-stdlib": "^0.0.3-alpha.0",
     "@unfig/toolkit-typescript": "^0.0.3-alpha.0",
-    "@unfig/type-toolkit": "^0.0.3-alpha.0"
+    "@unfig/type-toolkit": "^0.0.3-alpha.0",
+    "babel-jest": "^24.7.1"
   },
   "devDependencies": {
     "@unfig/toolkit-bare-node": "^0.0.3-alpha.0",
