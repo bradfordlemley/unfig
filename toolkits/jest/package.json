@@ -8,7 +8,7 @@
     "jest": "*"
   },
   "devDependencies": {
-    "@unfig/toolkit-bare-node": "^0.0.3-alpha.0",
+    "@unfig/toolkit-bare-node": "^0.0.4-alpha.0",
     "@unfig/type-toolkit": "^0.0.3-alpha.0",
     "unfig": "^0.0.3-alpha.0"
   }
