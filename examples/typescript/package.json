@@ -8,7 +8,7 @@
     "react-dom": "*"
   },
   "devDependencies": {
-    "@unfig/toolkit-react-comp": "^0.0.3-alpha.0",
+    "@unfig/toolkit-react-comp": "^0.0.4-alpha.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-testing-library": "^5.3.1",
