@@ -35,7 +35,8 @@ function makeJestCfg(cfg /* :StdPrjCfg */, file /* :string */) {
     testMatch: cfg.testFilePatterns.map(withRootDir),
     moduleFileExtensions: cfg.jsSrcExts,
     transform: {
-      [`^.+\\.(${cfg.jsSrcExts.join('|')})$`]: require.resolve('babel-jest'),
+      '.(js|jsx)$': require.resolve('babel-jest'),
+      '.(ts|tsx)$': require.resolve('ts-jest/dist'),
     },
     testPathIgnorePatterns: cfg.ignoreDirs.map(withRootTrailSlash),
     setupFilesAfterEnv: setupFilesAfterEnv.filter(existsRel).map(withRootDir),
