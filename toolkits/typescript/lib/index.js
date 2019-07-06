@@ -23,11 +23,12 @@ module.exports = (cfg => {
         include,
         exclude,
         compilerOptions: {
+          esModuleInterop: true,
           outDir,
           jsx: jsx || "react",
           moduleResolution: "node",
-          target: target || "ES2017",
-        },
+          target: target || "ES2017"
+        }
       })
     },
     commands: {
