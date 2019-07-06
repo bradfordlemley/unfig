@@ -2,16 +2,16 @@
   "name": "@unfig/ts-example",
   "license": "MIT",
   "author": "Bradford Lemley <bradfordlemley@gmail.com>",
-  "version": "0.0.3-alpha.0",
+  "version": "0.0.4-alpha.0",
   "peerDependencies": {
     "react": "*",
     "react-dom": "*"
   },
   "devDependencies": {
-    "@unfig/toolkit-react-comp": "^0.0.4-alpha.0",
+    "@unfig/toolkit-react-comp": "^0.0.5-alpha.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-testing-library": "^5.3.1",
-    "unfig": "^0.0.3-alpha.0"
+    "unfig": "^0.0.4-alpha.0"
   }
 }
