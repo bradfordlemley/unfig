@@ -19,37 +19,55 @@ module.exports = (cfg => {
   return {
     toolDependencies: true,
     jsonFiles: {
+      // typecheck options; includes all files, ie. typecheck src + tests
       "tsconfig.json": () => ({
-        include,
-        exclude,
         compilerOptions: {
+          alwaysStrict: true,
+          declaration: true,
           esModuleInterop: true,
-          outDir,
           jsx: jsx || "react",
           moduleResolution: "node",
+          noFallthroughCasesInSwitch: true,
+          noImplicitAny: true,
+          noImplicitReturns: true,
+          noImplicitThis: true,
+          noUnusedLocals: true,
+          noUnusedParameters: true,
+          outDir,
+          sourceMap: true,
+          strict: true,
+          strictFunctionTypes: true,
+          strictNullChecks: true,
+          strictPropertyInitialization: true,
           target: target || "ES2017"
         }
+      }),
+      // includes only src files
+      "tsconfig-build.json": () => ({
+        extends: "./tsconfig.json",
+        include,
+        exclude
       })
     },
     commands: {
       tsc: {
         describe: "tsc build",
-        handler: ({ env, args }) => env.run("tsc", args)
+        handler: ({ env, args }) =>
+          env.run("tsc", ["-p", "tsconfig-build.json"].concat(args))
       },
       tscDefs: {
         describe: "build type defs",
-        handler: ({ args, self }) => {
-          return self.execCmd(
+        handler: ({ env, args }) =>
+          env.run(
             "tsc",
-            ["-d", "--emitDeclarationOnly"].concat(args)
-          );
-        }
+            ["-p", "tsconfig-build.json", "-d", "--emitDeclarationOnly"].concat(
+              args
+            )
+          )
       },
       tscCheck: {
         describe: "run typescript checker",
-        handler: ({ args, self }) => {
-          return self.execCmd("tsc", ["--noEmit"].concat(args));
-        }
+        handler: ({ env, args }) => env.run("tsc", ["--noEmit"].concat(args))
       }
     },
     filepath: __filename
