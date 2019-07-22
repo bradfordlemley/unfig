@@ -133,3 +133,13 @@ test('Throws on args, but no command', async () => {
     /Unrecognized global arg: --fruit/
   );
 });
+
+test('initFile recreates deleted file', async () => {
+  const { execCmd } = ws;
+  const fpath = path.join(ws.dir, 'config2.js');
+  expect(fs.existsSync(fpath)).toBe(true);
+  await fs.remove(fpath);
+  expect(fs.existsSync(fpath)).toBe(false);
+  await expect(execCmd(['initFile', '--file', 'config2.js']));
+  expect(fs.existsSync(fpath)).toBe(true);
+});

@@ -16,6 +16,10 @@ type InitFlags = {
   unfigModule: ?string,
   toolkit: ?string,
 }
+
+type InitFileFlags = InitFlags & {
+  file: string,
+}
 */
 
 const defaultTemplateVars = {
@@ -96,12 +100,14 @@ async function createConfigModule(
     fs.writeFileSync(targetFile, content);
   }
 }
+const toJson = obj => JSON.stringify(obj, null, 2);
 
 async function createJsonFile(targetFile, json, opts) {
   let create = true;
+  const content = toJson(json);
   if (fs.existsSync(targetFile)) {
-    const existing = fs.readJsonSync(targetFile);
-    if (JSON.stringify(json) !== JSON.stringify(existing)) {
+    const existing = fs.readFileSync(targetFile);
+    if (content !== existing) {
       if (opts.force) {
         console.error(
           chalk.red(
@@ -142,7 +148,7 @@ async function createJsonFile(targetFile, json, opts) {
   }
 
   if (create) {
-    fs.writeJsonSync(targetFile, json);
+    fs.writeFileSync(targetFile, content);
   }
 }
 
@@ -224,8 +230,56 @@ const init = (async function init({ env, argv, args }) {
   return { code: 0 };
 } /*: InternalCmd<InitFlags> */);
 
+const initFile = (async function initFile({ env, argv }) {
+  const targetDir = env.rootDir;
+  console.log('make file: ', targetDir);
+  console.log('make file argv: ', argv);
+  const unfig = loadToolkit(targetDir);
+
+  if (unfig && unfig.modules) {
+    let promise = Promise.resolve();
+    Object.keys(unfig.modules).forEach(file => {
+      if (argv.file === file && unfig.modules && unfig.modules[file]) {
+        promise = promise.then(() =>
+          createConfigModule(path.join(targetDir, file), argv)
+        );
+      }
+    });
+    await promise;
+  }
+
+  if (unfig && unfig.jsonFiles) {
+    let promise = Promise.resolve();
+    Object.keys(unfig.jsonFiles).forEach(file => {
+      if (argv.file === file && unfig.jsonFiles && unfig.jsonFiles[file]) {
+        promise = promise.then(() =>
+          createJsonFile(
+            path.join(targetDir, file),
+            unfig.jsonFiles[file].handler(),
+            argv
+          )
+        );
+      }
+    });
+    await promise;
+  }
+
+  return { code: 0 };
+} /*: InternalCmd<InitFileFlags> */);
+
 module.exports = {
   commands: {
+    initFile: {
+      describe: 'Initialize project',
+      // $ExpectError: missing type annotation
+      builder: yargs =>
+        yargs.option('file', {
+          describe: 'Type of project to create',
+          requiresArg: true,
+          type: 'string',
+        }),
+      handler: initFile,
+    },
     init: {
       // command: 'init [--force]',
       describe: 'Initialize project',
