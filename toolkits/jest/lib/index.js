@@ -38,6 +38,15 @@ module.exports = (cfg => {
           env.run(
             'jest',
             ['--runInBand', '--no-cache', '--watch'].concat(args),
+            { nodeArgs: ['--inspect'] }
+          ),
+      },
+      'jest:debugbrk': {
+        describe: 'Debug while running jest tests',
+        handler: ({ env, args }) =>
+          env.run(
+            'jest',
+            ['--runInBand', '--no-cache', '--watch'].concat(args),
             { nodeArgs: ['--inspect-brk'] }
           ),
       },
