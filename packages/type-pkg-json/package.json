@@ -1,6 +1,6 @@
 {
   "name": "@unfig/type-pkg-json",
-  "version": "0.0.3-alpha.0",
+  "version": "0.0.8",
   "author": "Bradford Lemley <bradfordlemley@gmail.com>",
   "license": "MIT"
 }
