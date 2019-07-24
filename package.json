@@ -17,7 +17,7 @@
     "unfig": "node packages/unfig/lib/cli.js",
     "validate": "npm run flow && npm run lint && npm run test",
     "vsn": "lerna version --no-push --exact",
-    "push": "lerna exec -- npm publish"
+    "push": "lerna exec --no-bail -- npm publish"
   },
   "dependencies": {
     "husky": "^1.2.0",
