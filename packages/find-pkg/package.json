@@ -2,14 +2,14 @@
   "name": "@unfig/find-pkg",
   "license": "MIT",
   "author": "Bradford Lemley <bradfordlemley@gmail.com>",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "main": "lib/index.js",
   "dependencies": {
-    "@unfig/find-up": "0.0.8",
+    "@unfig/find-up": "0.0.9",
     "fs-extra": "^7.0.1"
   },
   "devDependencies": {
-    "@unfig/toolkit-bare-node": "0.0.8",
-    "unfig": "0.0.8"
+    "@unfig/toolkit-bare-node": "0.0.9",
+    "unfig": "0.0.9"
   }
 }

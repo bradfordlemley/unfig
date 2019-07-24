@@ -2,15 +2,15 @@
   "name": "@unfig/testutils",
   "license": "MIT",
   "author": "Bradford Lemley <bradfordlemley@gmail.com>",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "main": "lib/index.js",
   "dependencies": {
     "execa": "^1.0.0",
     "fs-extra": "^7.0.1"
   },
   "devDependencies": {
-    "@unfig/toolkit-bare-node": "0.0.8",
-    "unfig": "0.0.8"
+    "@unfig/toolkit-bare-node": "0.0.9",
+    "unfig": "0.0.9"
   },
   "engines": {
     "node": ">=8.3"

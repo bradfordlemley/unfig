@@ -2,7 +2,7 @@
   "name": "@unfig/react-example",
   "license": "MIT",
   "author": "Bradford Lemley <bradfordlemley@gmail.com>",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "main": "dist/index.js",
   "module": "dist-es/index.js",
   "dependencies": {
@@ -11,10 +11,10 @@
     "prop-types": "^15.7.2"
   },
   "devDependencies": {
-    "@unfig/toolkit-react-comp": "0.0.8",
+    "@unfig/toolkit-react-comp": "0.0.9",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-testing-library": "^5.2.3",
-    "unfig": "0.0.8"
+    "unfig": "0.0.9"
   }
 }

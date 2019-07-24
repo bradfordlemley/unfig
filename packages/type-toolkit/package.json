@@ -1,8 +1,8 @@
 {
   "name": "@unfig/type-toolkit",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "dependencies": {
-    "@unfig/type-pkg-json": "0.0.8"
+    "@unfig/type-pkg-json": "0.0.9"
   },
   "author": "Bradford Lemley <bradfordlemley@gmail.com>",
   "license": "MIT"
